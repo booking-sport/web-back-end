@@ -4,7 +4,6 @@ const managerController = require('../controllers/managerController');
 router.get('/', managerController.getAll);
 router.get('/:managerId', managerController.getById);
 
-router.post('/', managerController.create);
 router.post('/login', managerController.login);
 router.post('logout', managerController.logOut);
 

@@ -59,8 +59,6 @@ class UserService {
             if(player.hashedPassword) newPlayer.password = player.hashedPassword;
             if(player.phoneNumber) newPlayer.phone_number = player.phoneNumber;
 
-            console.log(newPlayer);
-
             await this.db('players')
                         .where('id', playerId)
                         .update(newPlayer)
