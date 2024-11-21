@@ -112,26 +112,16 @@ class UserService {
         }
     }
 
-    saveManger = async (manager) => {
-        try {
-            const {fullName, email, hashedPassword, phoneNumber, role} = manager;
-            const newManagerId = await this.db('managers').insert({full_name: fullName, email, password: hashedPassword, phone_number: phoneNumber, role});
-            return newManagerId;
-        } catch (error) {
-            throw errorHandler(503, error.message);
-        }
-    }
 
     updateManager = async (manager) => {
         try {
-            const {managerId} = manager;
+            const managerId = manager.managerId;
 
             const newManager = {};
             if(manager.fullName) newManager.full_name = manager.fullName;
             if(manager.email) newManager.email = manager.email;
             if(manager.hashedPassword) newManager.password = manager.hashedPassword;
             if(manager.phoneNumber) newManager.phone_number = player.phoneNumber;
-            if(manager.role) newManager.role = manager.role;
 
             console.log(newManager);
             await this.db('managers')

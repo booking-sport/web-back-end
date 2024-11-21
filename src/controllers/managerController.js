@@ -28,26 +28,6 @@ class ManagerController {
         }
     }
 
-    create = async (req,res,next) => {
-        try {
-            const {fullName, email, password, phoneNumber, role} = req.body;
-
-            const managerWithEmail = await this.userService.findManagerbyEmail(email);
-            if(managerWithEmail) return next(errorHandler(401, 'email is existed'));
-
-            const hashedPassword = bcryptjs.hashSync(password);
-            const newManagerId  = await this.userService.saveManger({fullName, email, hashedPassword, phoneNumber, role});
-
-            const userTokenData = {manager_id: newManagerId, full_name: fullName, email, phone_number: phoneNumber};
-            const token = this.authService.signToken(userTokenData);
-
-            res.cookie('jwt', token);
-            res.status(200).json({manager_id: newManagerId});
-        } catch (error) {
-            next(error);
-        }
-    }
-
     login = async (req,res,next) => {
         try {
             const {email, password} = req.body;
@@ -96,7 +76,7 @@ class ManagerController {
     delete = async (req,res,next) => {
         try {
             const managerId = req.params.managerId;
-            await this.userService.deletePlayer(managerId);
+            await this.userService.deleteManager(managerId);
             res.status(200).json({success: true});
         } catch (error) {
             next(error);
