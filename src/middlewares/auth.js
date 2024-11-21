@@ -12,6 +12,12 @@ exports.verifyToken = (req,res,next) => {
     });
 }
 
+exports.isAmin = (req,res,next) => {
+    const adminId = req.user.admin_id;
+    if(!adminId) return next(errorHandler(403, 'not admin system'));
+    next();
+}
+
 exports.isOwner = (req,res,next) => {
     const role = req.user.role;
     if(role != 'owner') return next(errorHandler(403, 'not owner stadium'));
