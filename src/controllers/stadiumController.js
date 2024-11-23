@@ -23,6 +23,16 @@ class StadiumController {
             next(error);
         }
     }
+
+    getOneStadium = async (req,res,next) => {
+        try {
+            const stadiumId = req.params.stadiumId;
+            const stadium = await this.stadiumService.findById(stadiumId);
+            res.status(200).json({stadium});
+        } catch (error) {
+            next(error);
+        }
+    }
     
     create = async (req,res,next) => {
         try {
