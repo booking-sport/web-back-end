@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const playerRouter = require('./routes/playerRouter');
 const managerRouter = require('./routes/managerRouter');
 const adminRouter = require('./routes/adminRouter');
+const stadiumRouter = require('./routes/stadiumRouter');
 
 require('dotenv').config();
 
@@ -26,6 +27,7 @@ app.use(
 app.use('/api/players', playerRouter);
 app.use('/api/managers', managerRouter);
 app.use('/api/admins', adminRouter);
+app.use('/api/stadiums', stadiumRouter);
 
 app.listen(PORT, () => {
     console.log(`server is running on ${PORT}`);
