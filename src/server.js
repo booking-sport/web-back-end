@@ -5,6 +5,7 @@ const playerRouter = require('./routes/playerRouter');
 const managerRouter = require('./routes/managerRouter');
 const adminRouter = require('./routes/adminRouter');
 const stadiumRouter = require('./routes/stadiumRouter');
+const commentRouter = require('./routes/commentRouter');
 
 require('dotenv').config();
 
@@ -28,6 +29,7 @@ app.use('/api/players', playerRouter);
 app.use('/api/managers', managerRouter);
 app.use('/api/admins', adminRouter);
 app.use('/api/stadiums', stadiumRouter);
+app.use('api/comments', commentRouter);
 
 app.listen(PORT, () => {
     console.log(`server is running on ${PORT}`);
