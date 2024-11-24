@@ -2,7 +2,7 @@
 const db = require('../config/dbConfig');
 const { errorHandler } = require('../helpers/errorHandler');
 
-class UserService {
+class CommentService {
     constructor() {
         this.db = db;
     }
@@ -64,6 +64,14 @@ class UserService {
         }
     }
 
+    deleteStadiumComments = async (stadiumId) => {
+        try {
+             await this.db('comments').where('stadium_id', stadiumId).delete();
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
     updateComment = async (commentId, newComment) => {
         try {
             await this.db('comments').where('id', commentId).update(newComment);
@@ -74,3 +82,4 @@ class UserService {
     }
 
 }
+module.exports = new CommentService();
