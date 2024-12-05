@@ -11,7 +11,7 @@ class OrderService {
         try {
             const orders = await this.db('order_details')
                                         .join('orders', 'order_details.order_id', 'orders.id')
-                                        .select('orders_details.*', 'orders.stadium_id', 'orders.player_id');
+                                        .select('order_details.*', 'orders.stadium_id', 'orders.player_id');
             return orders;
         } catch (error) {
             throw errorHandler(503, error.message);
@@ -22,7 +22,7 @@ class OrderService {
         try {
             const order = await this.db('order_details')
                                         .join('orders', 'order_details.order_id', 'orders.id')
-                                        .select('orders_details.*', 'orders.stadium_id', 'orders.player_id')
+                                        .select('order_details.*', 'orders.stadium_id', 'orders.player_id')
                                         .where('order_details.id', orderId)
                                         .first();
             return order;
@@ -35,7 +35,7 @@ class OrderService {
         try {
             const orders = await this.db('order_details')
                                         .join('orders', 'order_details.order_id', 'orders.id')
-                                        .select('orders_details.*', 'orders.stadium_id', 'orders.player_id')
+                                        .select('order_details.*', 'orders.stadium_id', 'orders.player_id')
                                         .where('orders.stadium_id', stadiumId);
                                         
             return orders;
@@ -48,7 +48,7 @@ class OrderService {
         try {
             const orders = await this.db('order_details')
                                         .join('orders', 'order_details.order_id', 'orders.id')
-                                        .select('orders_details.*', 'orders.stadium_id', 'orders.player_id')
+                                        .select('order_details.*', 'orders.stadium_id', 'orders.player_id')
                                         .whereIn('orders.stadium_id', stadiumIds);
                                         
             return orders;
@@ -83,7 +83,7 @@ class OrderService {
     saveOrder = async (order) => {
         try {
             const orderId = await this.db('orders').insert(order);
-            return orderId;
+            return orderId.at(0);
         } catch (error) {
             throw errorHandler(503, error.message);
         }
@@ -92,7 +92,7 @@ class OrderService {
     saveOrderDetails = async (orderDetails) => {
         try {
             const orderDetailsId = await this.db('order_details').insert(orderDetails);
-            return orderDetailsId;
+            return orderDetailsId.at(0);
         } catch (error) {
             throw errorHandler(503, error.message);
         }
