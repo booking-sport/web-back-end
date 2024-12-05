@@ -36,7 +36,9 @@ class OrderController {
 
     getOrdersForManager = async(req,res,next) => {
         try {
-            const managerId = req.user.manager_id;
+            req.user = {};
+            const managerId = req.user.manager_id || 1;
+            // console.log(managerId);
             const orders = await this.orderService.findSelfOrdersByManager(managerId);
             res.status(200).json({data: orders});
         } catch (error) {
@@ -46,7 +48,7 @@ class OrderController {
 
     getOrdersForPlayer = async (req,res,next) => {
         try {
-            const playerId = req.user.player_id;
+            const playerId = req.user.player_id || 1;
             const orders = await this.orderService.findByOnePlayer(playerId);
             res.status(200).json({data: orders});
         } catch (error) {
@@ -58,6 +60,7 @@ class OrderController {
         try {
             const orderCammelCase = req.body;
             const order = this.convertOrderCammelCase(orderCammelCase);
+            console.log(order);
             const newOrderId = await this.orderService.saveOrder(order);
             res.status(200).json({data: newOrderId});
         } catch (error) {
