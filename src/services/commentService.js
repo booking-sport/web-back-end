@@ -9,7 +9,17 @@ class CommentService {
 
     findAll = async () => {
         try {
-            return await this.db('comments').select('*');
+            const rows = await this.db('comments').select('*');
+            const allImages = await this.findImagesForAllComment();
+            const comments = rows.map((row) => {
+                const images = allImages[row.id] ? allImages[row.id] : [];
+                return {
+                    ...row,
+                    images
+                }
+            });
+            
+            return comments;
         } catch (error) {
             throw errorHandler(503, error.message);
         }
@@ -17,7 +27,10 @@ class CommentService {
 
     findById = async (commentId) => {
         try {
-            return await this.db('comments').select('*').where('id', commentId);
+            const basicInfo =  await this.db('comments').select('*').where('id', commentId).first();
+            const allImages = await this.findImagesForAllComment();
+            const images = allImages[commentId] ? allImages[commentId] : [];
+            return {...basicInfo, images};
         } catch (error) {
             throw errorHandler(503, error.message);
         }
@@ -25,26 +38,67 @@ class CommentService {
 
     findByStadiumId = async (stadiumId) => {
         try {
-            return await this.db('comments').select('*').where('stadium_id', stadiumId);
+            const rows = await this.db('comments').select('*').where('stadium_id', stadiumId);
+            const allImages = await this.findImagesForAllComment();
+            
+            const comments = rows.map((row) => {
+                const images = allImages[row.id] ? allImages[row.id] : [];
+                return {
+                    ...row,
+                    images
+                }
+            });
+
+            return comments;
         } catch (error) {
             throw errorHandler(503, error.message);
         }
     }
+
 
     findByPlayerId = async (playerId) => {
         try {
-            return await this.db('comments').select('*').where('player_id', playerId);
+            const rows =  await this.db('comments').select('*').where('player_id', playerId);
+            const allImages = await this.findImagesForAllComment();
+            
+            const comments = rows.map((row) => {
+                const images = allImages[row.id] ? allImages[row.id] : [];
+                return {
+                    ...row,
+                    images
+                }
+            });
+
+            return comments;
         } catch (error) {
             throw errorHandler(503, error.message);
         }
     }
 
+    findImagesForAllComment = async () => {
+        try {
+            const rows = await this.db('comments_images').select('*');
+
+            const images = rows.reduce( (arr,row) => {
+                const commentId = row.comment_id;
+                if(!arr[commentId]) arr[commentId] = [];
+                arr[commentId].push(row.image_path);
+                return arr;
+            }, {});
+
+            return images;
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
+
     saveComment = async (comment) => {
         try {
-            const {images, ...record} = {comment};
+            const {images, ...record} = comment;
             const rows = await this.db('comments').insert(record);
             const newCommentId = rows[0];
-            if(images) await this.saveImages(images, newCommentId);
+            if(images && images.length > 0) await this.saveImages(images, newCommentId);
             return newCommentId;
         } catch (error) {
             throw errorHandler(503, error.message);
