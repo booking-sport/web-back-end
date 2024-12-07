@@ -16,7 +16,8 @@ class StadiumController {
 
     getSelfStadium = async (req,res,next) => {
         try {
-            const managerId = req.user.manager_id;
+            // const managerId = req.user.manager_id;
+            const managerId = 4;
             const stadiums = await this.stadiumService.findByMangerId(managerId);
             res.status(200).json({data: stadiums});
         } catch (error) {
