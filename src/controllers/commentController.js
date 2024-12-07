@@ -49,9 +49,9 @@ class CommentController {
         try {
             const stadiumId = req.params.stadiumId;
             const playerId = req.user.player_id;
-            const {comment, rate} = req.body;
+            const {comment, rate, images} = req.body;
 
-            const newRecord = {comment, rate, stadium_id: stadiumId, player_id: playerId};
+            const newRecord = {comment, rate, stadium_id: stadiumId, player_id: playerId, images};
             const newComment = await this.commentService.saveComment(newRecord);
 
             res.status(200).json({data: newComment});
@@ -62,9 +62,12 @@ class CommentController {
 
     deleteOne = async (req,res,next) => {
         try {
+            const playerId = req.user.player_id;
             const commentId = req.params.commentId;
-            await this.commentService.deleteOneComment(commentId);
-            res.status(200).json({success: true});
+            const deletedBy = playerId ? 'player' : 'admin';
+            playerId ? await this.commentService.updateComment(commentId, {is_deleted: true})
+                    : await this.commentService.deleteOneComment(commentId);
+            res.status(200).json({success: true, deleted_by: deletedBy});
         } catch (error) {
             next(error);
         }
