@@ -37,13 +37,14 @@ class PriceService {
     //return details price for each unit on specific day -> 24 * 2  record 
     // return an array, length = 48
 
-    detailDailyPriceByStadiumId = async (stadiumId, dayOfWeek, orderType = 'single_booking') => {
+    detailDailyPriceByStadiumId = async (stadiumId, dayOfWeek, orderType) => {
         try {
             const conditions = {
                 stadium_id: stadiumId,
-                day_of_week: dayOfWeek,
-                order_type: orderType
             }
+            if(dayOfWeek) conditions['day_of_week'] = dayOfWeek;
+            if(orderType) conditions['order_type'] = orderType;
+
             const records = await this.db('prices')
                                         .select('*')
                                         .where(conditions)
