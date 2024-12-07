@@ -36,42 +36,8 @@ class PriceService {
 
     //return details price for each unit on specific day -> 24 * 2  record 
     // return an array, length = 48
-    // single booking
-    detailDailyPriceByStadiumId = async (stadiumId, dayOfWeek) => {
-        try {
-            const conditions = {
-                stadium_id: stadiumId,
-                day_of_week: dayOfWeek,
-                order_type: 'single_booking'
-            }
-            const records = await this.db('prices')
-                                        .select('*')
-                                        .where(conditions)
-    
-            const detailPrices = Array(48).fill(undefined);
 
-            records.forEach((record) => {
-                const beginShift = record.begin_shift;
-                const hourBegin = parseInt(beginShift.slice(0,2)), minuteBegin = parseInt(beginShift.slice(3,5));
-                const endShift = record.end_shift;
-                const hourEnd = parseInt(endShift.slice(0,2)), minuteEnd = parseInt(endShift.slice(3,5));
-
-                const startIndex = hourBegin*2 + minuteBegin/30;
-                const endIndex = hourEnd*2 + minuteEnd/30;
-
-                for(let i = startIndex; i < endIndex; i++){
-                    detailPrices[i] = record.price_per_uinit;
-                }
-            });
-
-            return detailPrices;
-        } catch (error) {
-            throw errorHandler(503, error.message);
-        }
-    }
-
-    // return an array with length = 48
-    detailFixOrderPriceByStadiumIdAndDay = async (stadiumId, dayOfWeek, orderType) => {
+    detailDailyPriceByStadiumId = async (stadiumId, dayOfWeek, orderType = 'single_booking') => {
         try {
             const conditions = {
                 stadium_id: stadiumId,
@@ -103,6 +69,40 @@ class PriceService {
             throw errorHandler(503, error.message);
         }
     }
+
+    // return an array with length = 48
+    // detailFixOrderPriceByStadiumIdAndDay = async (stadiumId, dayOfWeek, orderType) => {
+    //     try {
+    //         const conditions = {
+    //             stadium_id: stadiumId,
+    //             day_of_week: dayOfWeek,
+    //             order_type: orderType
+    //         }
+    //         const records = await this.db('prices')
+    //                                     .select('*')
+    //                                     .where(conditions)
+    
+    //         const detailPrices = Array(48).fill(undefined);
+
+    //         records.forEach((record) => {
+    //             const beginShift = record.begin_shift;
+    //             const hourBegin = parseInt(beginShift.slice(0,2)), minuteBegin = parseInt(beginShift.slice(3,5));
+    //             const endShift = record.end_shift;
+    //             const hourEnd = parseInt(endShift.slice(0,2)), minuteEnd = parseInt(endShift.slice(3,5));
+
+    //             const startIndex = hourBegin*2 + minuteBegin/30;
+    //             const endIndex = hourEnd*2 + minuteEnd/30;
+
+    //             for(let i = startIndex; i < endIndex; i++){
+    //                 detailPrices[i] = record.price_per_uinit;
+    //             }
+    //         });
+
+    //         return detailPrices;
+    //     } catch (error) {
+    //         throw errorHandler(503, error.message);
+    //     }
+    // }
 
 }
 module.exports = new PriceService();
