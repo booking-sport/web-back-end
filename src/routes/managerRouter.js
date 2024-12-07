@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const managerController = require('../controllers/managerController');
 
-router.get('/', managerController.getAll);
+router.get('/all', managerController.getAll);
 router.get('/:managerId', managerController.getById);
 
 router.post('/', managerController.create);
