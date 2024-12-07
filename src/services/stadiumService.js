@@ -75,8 +75,27 @@ class StadiumService {
 
     saveStadium = async (stadium) => {
         try {
-            const newStadiumId = await this.db('stadiums').insert(stadium);
-            return newStadiumId;
+            const {images, ...record} = stadium;
+            const newRecords = await this.db('stadiums').insert(record);
+            const newStadiumId = newRecords.at(0);
+            if(images && images.length > 0) await this.saveStadiumImages(images, newStadiumId);
+            return newStadiumId
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
+    saveStadiumImages = async (images, stadiumId) => {
+        try {
+            let records = [];
+            records = images.map((url) => {
+                return {
+                    image_path: url,
+                    stadium_id: stadiumId
+                }
+            });
+
+            await this.db('stadiums_images').insert(records);
         } catch (error) {
             throw errorHandler(503, error.message);
         }
