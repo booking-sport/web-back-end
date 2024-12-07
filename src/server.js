@@ -7,6 +7,7 @@ const adminRouter = require('./routes/adminRouter');
 const stadiumRouter = require('./routes/stadiumRouter');
 const commentRouter = require('./routes/commentRouter');
 const orderRouter = require('./routes/orderRouter');
+const priceRouter = require('./routes/priceRouter');
 
 require('dotenv').config();
 
@@ -31,6 +32,7 @@ app.use('/api/admins', adminRouter);
 app.use('/api/stadiums', stadiumRouter);
 app.use('/api/comments', commentRouter);
 app.use('/api/orders', orderRouter);
+app.use('/api/price', priceRouter);
 
 app.listen(PORT, () => {
     console.log(`server is running on ${PORT}`);
