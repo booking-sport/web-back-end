@@ -27,6 +27,22 @@ class ManagerController {
             next(error);
         }
     }
+    
+    create = async (req,res,next) => {
+        try {
+            const {fullName, email, password, phoneNumber} = req.body;
+
+            const maangerWithEmail = await this.userService.findManagerbyEmail(email);
+            if(maangerWithEmail) return next(errorHandler(401, 'email is existed'));
+
+            const hashedPassword = bcryptjs.hashSync(password);
+            const newManagerId = await this.userService.saveManager({fullName, email, hashedPassword, phoneNumber});
+            
+            res.status(200).json({data: newManagerId});
+        } catch (error) {
+            next(error);
+        }
+    }
 
     login = async (req,res,next) => {
         try {

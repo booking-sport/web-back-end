@@ -110,6 +110,19 @@ class UserService {
         }
     }
 
+    saveManager = async (manager) => {
+        try {
+            const {fullName, email, hashedPassword, phoneNumber} = manager;
+            const rows = await this.db('managers')
+                                        .insert({full_name: fullName, email, password: hashedPassword, phone_number: phoneNumber});
+            const newUserId= rows[0];
+            return newUserId
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+        
+    }
+
 
     updateManager = async (manager) => {
         try {
