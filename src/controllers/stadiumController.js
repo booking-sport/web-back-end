@@ -16,7 +16,8 @@ class StadiumController {
 
     getSelfStadium = async (req,res,next) => {
         try {
-            const managerId = req.user.manager_id;
+            // const managerId = req.user.manager_id;
+            const managerId = 4;
             const stadiums = await this.stadiumService.findByMangerId(managerId);
             res.status(200).json({data: stadiums});
         } catch (error) {
@@ -99,15 +100,17 @@ class StadiumController {
 
     convertCammelCase(stadium) {
         return {
-            stadium_type: stadium.stdiumType,
+            stadium_type: stadium.stadiumType,
             name: stadium.name,
             address: stadium.address,
             longtitue: stadium.longtitue,
             latitue: stadium.latitue,
+            award: stadium.award,
             strict: stadium.strict,
             province: stadium.province,
             open_time: stadium.openTime,
             close_time: stadium.closeTime,
+            number_field: stadium.numberField,
             bank_account: stadium.bankAccount,
             bank: stadium.bank,
             images: stadium.images,

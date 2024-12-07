@@ -8,7 +8,13 @@ class StadiumService {
 
     findAll = async () => {
         try {
-            return await this.db('stadiums').select('*');
+            const records = await this.db('stadiums').select('*');
+            const images = await this.findImagesByAllStadium();
+            const stadiums = records.map((record) => {
+                const imageStadium = images[record.id] ? images[record.id] : [];
+                return {...record, "images": imageStadium};
+            });
+            return stadiums;
         } catch (error) {
             throw errorHandler(503, error.message);            
         }
@@ -16,7 +22,38 @@ class StadiumService {
 
     findById = async (stadiumId) => {
         try {
-            return await this.db('stadiums').select('*').where('id', stadiumId).first();
+            const basicInfo = await this.db('stadiums').select('*').where('id', stadiumId).first();
+            const images = await this.findImagesByStadiumId(stadiumId);
+            return {...basicInfo, images};
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
+    findImagesByStadiumId = async (stadiumId) => {
+        try {
+            const rows = await this.db('stadiums_images')
+                                        .select('image_path')
+                                        .where('stadium_id', stadiumId)
+            const images = rows.map((ele) => ele.image_path);
+            return images;
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
+    findImagesByAllStadium = async () => {
+        try {
+            const rows = await this.db('stadiums_images').select('*');
+
+            const images = rows.reduce( (arr,row) => {
+                const stadiumId = row.stadium_id;
+                if(!arr[stadiumId]) arr[stadiumId] = [];
+                arr[stadiumId].push(row.image_path);
+                return arr;
+            }, {});
+
+            return images;
         } catch (error) {
             throw errorHandler(503, error.message);
         }
@@ -24,10 +61,16 @@ class StadiumService {
 
     findByMangerId = async (managerId) => {
         try {
-            const stadiums = await this.db('stadiums_managers')
+            const records = await this.db('stadiums_managers')
                                         .join('stadiums', 'stadiums_managers.stadium_id', 'stadiums.id')
                                         .select('stadiums.*')
                                         .where('stadiums_managers.manager_id', managerId);
+            
+            const images = await this.findImagesByAllStadium();
+            const stadiums = records.map((record) => {
+                const imageStadium = images[record.id] ? images[record.id] : [];
+                return {...record, "images": imageStadium};
+            });
             return stadiums;
         } catch (error) {
             throw errorHandler(503, error.message);
@@ -75,8 +118,27 @@ class StadiumService {
 
     saveStadium = async (stadium) => {
         try {
-            const newStadiumId = await this.db('stadiums').insert(stadium);
-            return newStadiumId;
+            const {images, ...record} = stadium;
+            const newRecords = await this.db('stadiums').insert(record);
+            const newStadiumId = newRecords.at(0);
+            if(images && images.length > 0) await this.saveStadiumImages(images, newStadiumId);
+            return newStadiumId
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
+    saveStadiumImages = async (images, stadiumId) => {
+        try {
+            let records = [];
+            records = images.map((url) => {
+                return {
+                    image_path: url,
+                    stadium_id: stadiumId
+                }
+            });
+
+            await this.db('stadiums_images').insert(records);
         } catch (error) {
             throw errorHandler(503, error.message);
         }
