@@ -8,7 +8,7 @@ class StadiumController {
     getAll = async (req,res,next) => {
         try {
             const stadiums = await this.stadiumService.findAll();
-            res.status(200).json({stadiums});
+            res.status(200).json({data: stadiums});
         } catch (error) {
             next(error);
         }
@@ -18,7 +18,7 @@ class StadiumController {
         try {
             const managerId = req.user.manager_id;
             const stadiums = await this.stadiumService.findByMangerId(managerId);
-            res.status(200).json({stadiums});
+            res.status(200).json({data: stadiums});
         } catch (error) {
             next(error);
         }
@@ -28,7 +28,7 @@ class StadiumController {
         try {
             const stadiumId = req.params.stadiumId;
             const stadium = await this.stadiumService.findById(stadiumId);
-            res.status(200).json({stadium});
+            res.status(200).json({data: stadium});
         } catch (error) {
             next(error);
         }
@@ -39,7 +39,7 @@ class StadiumController {
             const stadiumCammelCase = req.body;
             const stadium = this.convertCammelCase(stadiumCammelCase);
             const newStadiumId = await this.stadiumService.saveStadium(stadium);
-            res.status(200).json({new_stadium_id: newStadiumId});
+            res.status(200).json({data: newStadiumId});
         } catch (error) {
             next(error);
         }
@@ -91,7 +91,7 @@ class StadiumController {
             const stadiumCammelCase = req.body;
             const stadium = this.convertCammelCase(stadiumCammelCase);
             const newStadium = await this.stadiumService.update(stadiumId, stadium);
-            res.status(200).json({new_stadium: newStadium});
+            res.status(200).json({data: newStadium});
         } catch (error) {
             next(error);
         }

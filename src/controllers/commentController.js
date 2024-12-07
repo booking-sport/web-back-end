@@ -9,7 +9,7 @@ class CommentController {
     getAll = async (req,res,next) => {
         try {
             const comments = await this.commentService.findAll();
-            res.status(200).json({comments});
+            res.status(200).json({data: comments});
         } catch (error) {
             next(error);
         }
@@ -19,7 +19,7 @@ class CommentController {
         try {
             const commentId = req.params.commentId;
             const comment = await this.commentService.findById(commentId);
-            res.status(200).json(comment);
+            res.status(200).json({data: comment});
         } catch (error) {
             next(error);
         }
@@ -29,7 +29,7 @@ class CommentController {
         try {
             const stadiumId = req.params.stadiumId;
             const comments = await this.commentService.findByStadiumId(stadiumId);
-            res.status(200).json(comments);
+            res.status(200).json({data: comments});
         } catch (error) {
             next(error);
         }
@@ -39,7 +39,7 @@ class CommentController {
         try {
             const playerId = req.params.playerId;
             const comments = await this.commentService.findByPlayerId(playerId);
-            res.status(200).json(comments);
+            res.status(200).json({data: comments});
         } catch (error) {
             next(error);
         }
@@ -49,12 +49,12 @@ class CommentController {
         try {
             const stadiumId = req.params.stadiumId;
             const playerId = req.user.player_id;
-            const {comment, rate} = req.body;
+            const {comment, rate, images} = req.body;
 
-            const newRecord = {comment, rate, stadium_id: stadiumId, player_id: playerId};
+            const newRecord = {comment, rate, stadium_id: stadiumId, player_id: playerId, images};
             const newComment = await this.commentService.saveComment(newRecord);
 
-            res.status(200).json({newComment});
+            res.status(200).json({data: newComment});
         } catch (error) {
             next(error);
         }
@@ -62,9 +62,12 @@ class CommentController {
 
     deleteOne = async (req,res,next) => {
         try {
+            const playerId = req.user.player_id;
             const commentId = req.params.commentId;
-            await this.commentService.deleteOneComment(commentId);
-            res.status(200).json({success: true});
+            const deletedBy = playerId ? 'player' : 'admin';
+            playerId ? await this.commentService.updateComment(commentId, {is_deleted: true})
+                    : await this.commentService.deleteOneComment(commentId);
+            res.status(200).json({success: true, deleted_by: deletedBy});
         } catch (error) {
             next(error);
         }
@@ -85,7 +88,7 @@ class CommentController {
             const commentId = req.params.commentId;
             const {rate, comment} = req.body;
             const newComment = await this.commentService.updateComment(commentId, {rate, comment});
-            res.status(200).json({newComment});
+            res.status(200).json({data: newComment});
         } catch (error) {
             next(error);
         }

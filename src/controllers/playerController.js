@@ -12,7 +12,7 @@ class PlayerController {
     getAll = async (req,res,next) => {
         try {
             const players = await this.userService.findAllPlayer();
-            res.status(200).json({players});
+            res.status(200).json({data: players});
         } catch (error) {
             next(error);
         }
@@ -22,7 +22,7 @@ class PlayerController {
         try {
             const playerId = req.params.playerId;
             const player = await this.userService.findPlayerbyId(playerId);
-            res.status(200).json({player});
+            res.status(200).json({data: player});
         } catch (error) {
             next(error);
         }
@@ -41,7 +41,7 @@ class PlayerController {
             const userTokenData = {player_id: newPlayerId, full_name: fullName, email, phone_number: phoneNumber};
             const token = this.authService.signToken(userTokenData);
             res.cookie('jwt', token);
-            res.status(200).json({player_id: newPlayerId});
+            res.status(200).json({data: newPlayerId});
         } catch (error) {
             next(error);
         }
@@ -59,7 +59,7 @@ class PlayerController {
             const token = this.authService.signToken(userTokenData);
 
             res.cookie('jwt', token);
-            res.status(200).json({token});
+            res.status(200).json({data: token});
         } 
         catch (error) {
             next(error);
@@ -84,7 +84,7 @@ class PlayerController {
             if(password) hashedPassword = bcryptjs.hashSync(password);
 
             const newPlayer = await this.userService.updatePlayer({playerId,fullName,email,hashedPassword,phoneNumber});
-            res.status(200).json({player: newPlayer});
+            res.status(200).json({data: newPlayer});
         } catch (error) {
             next(error);
         }

@@ -41,8 +41,25 @@ class CommentService {
 
     saveComment = async (comment) => {
         try {
-            const newComment = await this.db('comments').insert(comment);
-            return newComment;
+            const {images, ...record} = {comment};
+            const rows = await this.db('comments').insert(record);
+            const newCommentId = rows[0];
+            if(images) await this.saveImages(images, newCommentId);
+            return newCommentId;
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
+    saveImages = async(images, commentId) => {
+        try {
+            const records = images.map((url) => {
+                return {
+                    image_path: url,
+                    comment_id: commentId
+                }
+            });
+            await this.db('comments_images').insert(records);
         } catch (error) {
             throw errorHandler(503, error.message);
         }

@@ -12,7 +12,7 @@ class ManagerController {
     getAll = async (req,res,next) => {
         try {
             const managers = await this.userService.findAllManager();
-            res.status(200).json({managers});
+            res.status(200).json({data: managers});
         } catch (error) {
             next(error);
         }
@@ -22,7 +22,7 @@ class ManagerController {
         try {
             const managerId = req.params.managerId;
             const manager = await this.userService.findManagerbyId(managerId);
-            res.status(200).json({manager});
+            res.status(200).json({data: manager});
         } catch (error) {
             next(error);
         }
@@ -42,7 +42,7 @@ class ManagerController {
             const token = this.authService.signToken(userTokenData);
 
             res.cookie('jwt', token);
-            res.status(200).json({token});
+            res.status(200).json({data: token});
         } 
         catch (error) {
             next(error);
@@ -66,8 +66,8 @@ class ManagerController {
             let hashedPassword;
             if(password) hashedPassword = bcryptjs.hashSync(password);
 
-            const newPlayer = await this.userService.updateManager({managerId,fullName,email,hashedPassword,phoneNumber, role});
-            res.status(200).json({player: newPlayer});
+            const newManager = await this.userService.updateManager({managerId,fullName,email,hashedPassword,phoneNumber, role});
+            res.status(200).json({data: newManager});
         } catch (error) {
             next(error);
         }

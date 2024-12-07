@@ -95,6 +95,7 @@ class OrderController {
             const orderId = req.params.orderId;
             const newOrder = this.convertOrderDetailCammelCase(req.body);
             const updatedOrder = await this.orderService.updateOrder(orderId, newOrder);
+            res.status(200).json({data: updatedOrder});
         } catch (error) {
             next(error);
         }
