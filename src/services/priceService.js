@@ -1,5 +1,6 @@
 const db = require('../config/dbConfig');
 const { errorHandler } = require('../helpers/errorHandler');
+const stadiumService = require('./stadiumService');
 
 class PriceService {
     constructor(){
@@ -65,8 +66,16 @@ class PriceService {
                     detailPrices[i] = record.price_per_unit;
                 }
             });
+
+            const fields = await stadiumService.findFieldsByStadiumId(stadiumId);
+            const fieldsPrice = fields.map((field) => {
+                return {
+                    fieldId: field.id,
+                    unitPrice: detailPrices
+                }
+            })
             
-            return detailPrices;
+            return fieldsPrice;
         } catch (error) {
             throw errorHandler(503, error.message);
         }
