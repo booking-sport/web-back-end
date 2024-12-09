@@ -115,6 +115,15 @@ class StadiumService {
         }
     }
 
+    findFieldsByStadiumId = async (stadiumId) => {
+        try {
+            const fields = await this.db('fields').select('*').where('stadium_id', stadiumId);
+            return fields;
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
 
     saveStadium = async (stadium) => {
         try {
