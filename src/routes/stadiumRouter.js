@@ -4,6 +4,7 @@ const stadiumController = require('../controllers/stadiumController');
 router.get('/all', stadiumController.getAll);
 router.get('/manager', stadiumController.getSelfStadium);
 router.get('/:stadiumId', stadiumController.getOneStadium);
+router.get('/:stadiumId/fields', stadiumController.getFields);
 
 router.post('/', stadiumController.create);
 router.post('/:stadiumId/staff/:staffId', stadiumController.addStaff);

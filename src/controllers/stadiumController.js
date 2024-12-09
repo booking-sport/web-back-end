@@ -34,6 +34,16 @@ class StadiumController {
             next(error);
         }
     }
+
+    getFields = async (req,res,next) => {
+        try {
+            const stadiumId = req.params.stadiumId;
+            const fields = await this.stadiumService.findFieldsByStadiumId(stadiumId);
+            res.status(200).json({data: fields});
+        } catch (error) {
+            next(error);
+        }
+    }
     
     create = async (req,res,next) => {
         try {
