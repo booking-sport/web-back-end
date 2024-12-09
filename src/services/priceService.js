@@ -37,7 +37,7 @@ class PriceService {
     //return details price for each unit on specific day -> 24 * 2  record 
     // return an array, length = 48
 
-    detailDailyPriceByStadiumId = async (stadiumId, dayOfWeek, orderType = 'single_booking') => {
+    detailDailyPriceByStadiumId = async (stadiumId, dayOfWeek = 'monday', orderType = 'single_booking') => {
         try {
             const conditions = {
                 stadium_id: stadiumId,

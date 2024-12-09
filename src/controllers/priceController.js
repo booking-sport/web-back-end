@@ -32,8 +32,7 @@ class PriceController{
         try {
             const {stadiumId} = req.params;
             const {dayOfWeek, orderType} = req.query;
-            console.log(stadiumId, dayOfWeek);
-
+            
             const prices = await this.priceService.detailDailyPriceByStadiumId(stadiumId, dayOfWeek, orderType);
             res.status(200).json({data: prices});
         } catch (error) {
