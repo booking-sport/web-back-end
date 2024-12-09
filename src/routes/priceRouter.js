@@ -4,6 +4,6 @@ const priceController = require('../controllers/priceController');
 router.get('/all/:stadiumId', priceController.getStadiumAllPrices);
 router.get('/detail/:stadiumId', priceController.getPriceByDay);
 
-router.post('/', priceController.create);
+router.post('/:stadiumId', priceController.create);
 
 module.exports = router;
