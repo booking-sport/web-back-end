@@ -8,9 +8,14 @@ class StadiumService {
         this.db = db;
     }
 
-    findAll = async () => {
+    findAll = async (stadiumType, name) => {
         try {
-            const records = await this.db('stadiums').select('*');
+            const records = await this.db('stadiums')
+                                            .select('*')
+                                            .where((query) => {
+                                                if(stadiumType) query.where('stadium_type', stadiumType);
+                                                if(name) query.where('name', 'like', `%${name}%`);
+                                            })
             const images = await this.findImagesByAllStadium();
             const stadiums = records.map((record) => {
                 const imageStadium = images[record.id] ? images[record.id] : [];
