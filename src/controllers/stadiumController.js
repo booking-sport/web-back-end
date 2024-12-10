@@ -57,6 +57,17 @@ class StadiumController {
         }
     }
 
+    addField = async (req,res,next) => {
+        try {
+            const stadiumId = req.params.stadiumId;
+            const field = req.body;
+            const newFieldId = await this.stadiumService.saveField(stadiumId, field);
+            res.status(200).json({data: newFieldId});
+        } catch (error) {
+            next(error);
+        }
+    }
+
     addStaff = async (req,res,next) => {
         try {
             const {stadiumId, staffId} = req.params;

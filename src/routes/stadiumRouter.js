@@ -7,6 +7,7 @@ router.get('/:stadiumId', stadiumController.getOneStadium);
 router.get('/:stadiumId/fields', stadiumController.getFields);
 
 router.post('/', stadiumController.create);
+router.post('/:stadiumId/field', stadiumController.addField);
 router.post('/:stadiumId/staff/:staffId', stadiumController.addStaff);
 router.post('/:stadiumId/owner/:ownerId', stadiumController.assignOwner);
 

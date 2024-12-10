@@ -163,6 +163,14 @@ class StadiumService {
         }
     }
 
+    saveField = async (stadiumId, field) => {
+        try {
+            const newFieldId = await this.db('fields').insert({stadium_id: stadiumId, ...field});
+            return newFieldId;
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
     // delete old owner and inser new owner
     assignOwner = async (stadiumId, ownerId) => {
         try {
