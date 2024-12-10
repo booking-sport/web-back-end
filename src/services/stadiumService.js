@@ -8,9 +8,14 @@ class StadiumService {
         this.db = db;
     }
 
-    findAll = async () => {
+    findAll = async (stadiumType, name) => {
         try {
-            const records = await this.db('stadiums').select('*');
+            const records = await this.db('stadiums')
+                                            .select('*')
+                                            .where((query) => {
+                                                if(stadiumType) query.where('stadium_type', stadiumType);
+                                                if(name) query.where('name', 'like', `%${name}%`);
+                                            })
             const images = await this.findImagesByAllStadium();
             const stadiums = records.map((record) => {
                 const imageStadium = images[record.id] ? images[record.id] : [];
@@ -27,8 +32,9 @@ class StadiumService {
             const basicInfo = await this.db('stadiums').select('*').where('id', stadiumId).first();
             const images = await this.findImagesByStadiumId(stadiumId);
             const owner = await userService.findStadiumOwner(stadiumId);
+            const fields = await this.findFieldsByStadiumId(stadiumId);
             const ratings = await commentService.countRatingForStadium(stadiumId);
-            return {...basicInfo, images, ratings, owner};
+            return {...basicInfo, images, ratings, owner, fields};
         } catch (error) {
             throw errorHandler(503, error.message);
         }

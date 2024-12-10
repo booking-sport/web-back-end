@@ -97,6 +97,7 @@ class CommentService {
             const ratingCnt = await this.db('comments')
                                     .select('rate')
                                     .count('* as count')
+                                    .where('stadium_id', stadiumId)
                                     .groupBy('rate')
                                     .orderBy('rate');
             return ratingCnt;

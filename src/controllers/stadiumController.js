@@ -7,7 +7,8 @@ class StadiumController {
 
     getAll = async (req,res,next) => {
         try {
-            const stadiums = await this.stadiumService.findAll();
+            const {stadiumType, name} = req.query;
+            const stadiums = await this.stadiumService.findAll(stadiumType, name);
             res.status(200).json({data: stadiums});
         } catch (error) {
             next(error);
