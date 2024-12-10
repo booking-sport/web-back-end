@@ -34,6 +34,16 @@ class StadiumController {
             next(error);
         }
     }
+
+    getFields = async (req,res,next) => {
+        try {
+            const stadiumId = req.params.stadiumId;
+            const fields = await this.stadiumService.findFieldsByStadiumId(stadiumId);
+            res.status(200).json({data: fields});
+        } catch (error) {
+            next(error);
+        }
+    }
     
     create = async (req,res,next) => {
         try {
@@ -103,8 +113,8 @@ class StadiumController {
             stadium_type: stadium.stadiumType,
             name: stadium.name,
             address: stadium.address,
-            longtitue: stadium.longtitue,
-            latitue: stadium.latitue,
+            longitude: stadium.longitude,
+            latitude: stadium.latitude,
             award: stadium.award,
             strict: stadium.strict,
             province: stadium.province,

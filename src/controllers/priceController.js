@@ -7,8 +7,10 @@ class PriceController{
 
     create = async (req,res,next) => {
         try {
-            const price = req.body;
-            const priceToSave = this.convertCammelCase(price);
+            const stadiumId = req.params.stadiumId;
+            const data = req.body;
+            const priceCammelCase = this.convertCammelCase(data);
+            const priceToSave = {stadium_id: stadiumId, ...priceCammelCase};
             const newPriceId = await this.priceService.saveAprice(priceToSave);
             res.status(200).json({data: newPriceId});
         } catch (error) {
@@ -30,7 +32,7 @@ class PriceController{
         try {
             const {stadiumId} = req.params;
             const {dayOfWeek, orderType} = req.query;
-
+            
             const prices = await this.priceService.detailDailyPriceByStadiumId(stadiumId, dayOfWeek, orderType);
             res.status(200).json({data: prices});
         } catch (error) {
@@ -47,7 +49,7 @@ class PriceController{
             unit_time: price.unitTime,
             price_per_unit: price.pricePerUnit,
             enable_deposit: price.enableDeposit,
-            stadium_id: price.stadiumId
+            deposit_price_per_unit: price.depositPerPriceUnit
         }
     }
 }

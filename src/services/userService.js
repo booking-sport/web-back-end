@@ -110,6 +110,20 @@ class UserService {
         }
     }
 
+    findStadiumOwner = async (stadiumId) => {
+        try {
+            const owner = await this.db('managers')
+                                        .join('stadiums_managers', 'stadiums_managers.manager_id', 'managers.id')
+                                        .select('managers.*')
+                                        .where('stadiums_managers.stadium_id', stadiumId)
+                                        .first()
+
+            return owner;
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
     saveManager = async (manager) => {
         try {
             const {fullName, email, hashedPassword, phoneNumber} = manager;
