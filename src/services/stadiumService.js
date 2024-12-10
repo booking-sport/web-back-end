@@ -1,5 +1,7 @@
 const db = require('../config/dbConfig');
 const { errorHandler } = require('../helpers/errorHandler');
+const commentService = require('./commentService');
+const userService = require('./userService');
 
 class StadiumService {
     constructor() {
@@ -24,7 +26,9 @@ class StadiumService {
         try {
             const basicInfo = await this.db('stadiums').select('*').where('id', stadiumId).first();
             const images = await this.findImagesByStadiumId(stadiumId);
-            return {...basicInfo, images};
+            const owner = await userService.findStadiumOwner(stadiumId);
+            const ratings = await commentService.countRatingForStadium(stadiumId);
+            return {...basicInfo, images, ratings, owner};
         } catch (error) {
             throw errorHandler(503, error.message);
         }

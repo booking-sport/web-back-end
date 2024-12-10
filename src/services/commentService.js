@@ -92,6 +92,19 @@ class CommentService {
         }
     }
 
+    countRatingForStadium = async (stadiumId) => {
+        try {
+            const ratingCnt = await this.db('comments')
+                                    .select('rate')
+                                    .count('* as count')
+                                    .groupBy('rate')
+                                    .orderBy('rate');
+            return ratingCnt;
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
 
     saveComment = async (comment) => {
         try {
