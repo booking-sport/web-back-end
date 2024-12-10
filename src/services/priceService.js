@@ -71,6 +71,7 @@ class PriceService {
             const fieldsPrice = fields.map((field) => {
                 return {
                     fieldId: field.id,
+                    fieldName: field.name,
                     unitPrice: detailPrices
                 }
             })

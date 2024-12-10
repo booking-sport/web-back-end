@@ -27,8 +27,9 @@ class StadiumService {
             const basicInfo = await this.db('stadiums').select('*').where('id', stadiumId).first();
             const images = await this.findImagesByStadiumId(stadiumId);
             const owner = await userService.findStadiumOwner(stadiumId);
+            const fields = await this.findFieldsByStadiumId(stadiumId);
             const ratings = await commentService.countRatingForStadium(stadiumId);
-            return {...basicInfo, images, ratings, owner};
+            return {...basicInfo, images, ratings, owner, fields};
         } catch (error) {
             throw errorHandler(503, error.message);
         }
