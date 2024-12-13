@@ -1,3 +1,4 @@
+const { errorHandler } = require('../helpers/errorHandler');
 const orderService = require('../services/orderService');
 
 class OrderController {
@@ -27,7 +28,8 @@ class OrderController {
     getOrdersForOneStadium = async(req,res,next) => {
         try {
             const stadiumId = req.params.stadiumId;
-            const orders = await this.orderService.findByOneStadium(stadiumId);
+            const date = req.query.date;
+            const orders = await this.orderService.findByOneStadium(stadiumId, date);
             res.status(200).json({data: orders});
         } catch (error) {
             next(error);
@@ -58,22 +60,32 @@ class OrderController {
 
     createOrder = async (req,res,next) => {
         try {
-            const orderCammelCase = req.body;
-            const order = this.convertOrderCammelCase(orderCammelCase);
-            console.log(order);
-            const newOrderId = await this.orderService.saveOrder(order);
-            res.status(200).json({data: newOrderId});
-        } catch (error) {
-            next(error);
-        }
-    }
+            // const playerId = req.user.player_id;
+            const playerId  = 1;
+            const {orders, note} = req.body;
+            const stadiumId = req.params.stadiumId;
+            
+            if(!orders || orders.length == 0) return next(errorHandler(402, 'orders can not be empty'));
 
-    createOrderDetails = async (req,res,next) => {
-        try {
-            const orderDetailsCammelCase = req.body;
-            const orderDetails = this.convertOrderDetailCammelCase(orderDetailsCammelCase);
-            const newOrderId = await this.orderService.saveOrderDetails(orderDetails);
-            res.status(200).json({data: newOrderId});
+            const bigOrder = orders.reduce((obj, order) => {
+                obj.total_price = obj.total_price ? obj.total_price + order.price: order.price;
+                obj.order_type  = order.orderType;
+                return obj;
+            }, {});
+            
+            bigOrder.stadium_id = stadiumId;
+            bigOrder.player_id = playerId;
+            bigOrder.note = note;
+            bigOrder.is_created_by_player = true;
+            console.log(bigOrder);
+
+            const orderId = await this.orderService.saveOrder(bigOrder);
+            const ordersToSave = orders.map((order) => {
+                return this.convertOrderDetailCammelCase({...order, stadiumId, orderId})
+            });
+            await this.orderService.saveOrderDetails(ordersToSave);
+
+            res.status(200).json({data: orderId});
         } catch (error) {
             next(error);
         }
@@ -101,16 +113,16 @@ class OrderController {
         }
     }
 
-    convertOrderCammelCase (order){
-        return {
-            order_type: order.orderType,
-            total_price: order.totalPrice,
-            note: order.note,
-            is_created_by_player: order.isCreatedByPlayer,
-            player_id: order.playerId,
-            stadium_id: order.stadiumId
-        }
-    }
+    // convertOrderCammelCase (order){
+    //     return {
+    //         order_type: order.orderType,
+    //         total_price: order.totalPrice,
+    //         note: order.note,
+    //         is_created_by_player: order.isCreatedByPlayer,
+    //         player_id: order.playerId,
+    //         stadium_id: order.stadiumId
+    //     }
+    // }
 
     convertOrderDetailCammelCase (orderDetails) {
         return {
@@ -119,8 +131,10 @@ class OrderController {
             begin_time: orderDetails.beginTime,
             end_time: orderDetails.endTime,
             price: orderDetails.price,
-            order_id: orderDetails.orderId,
             field_id: orderDetails.fieldId,
+
+            order_id: orderDetails.orderId,
+            stadium_id: orderDetails.stadiumId,
             order_status: orderDetails.orderStatus
         }
     }

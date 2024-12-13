@@ -8,8 +8,8 @@ router.get('/self/manager', orderController.getOrdersForManager);
 router.get('/self/player', orderController.getOrdersForPlayer);
 
 
-router.post('/', orderController.createOrder);
-router.post('/details', orderController.createOrderDetails);
+router.post('/stadium/:stadiumId', orderController.createOrder);
+
 
 //just to update status from player
 router.put('/:orderId', orderController.updateOrder);

@@ -31,12 +31,30 @@ class OrderService {
         }
     }
 
-    findByOneStadium = async (stadiumId) => {
+    findByOneStadium = async (stadiumId, date) => {
         try {
             const orders = await this.db('order_details')
                                         .join('orders', 'order_details.order_id', 'orders.id')
                                         .select('order_details.*', 'orders.stadium_id', 'orders.player_id')
-                                        .where('orders.stadium_id', stadiumId);
+                                        .where('orders.stadium_id', stadiumId)
+                                        .where((query) => {
+                                            if(date) query.where('order_details.date', date)
+                                        })
+                                        
+            return orders;
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
+    findOrderToday = async (stadiumId, date) => {
+        try {
+            // console.log(stadiumId, date);
+            const orders = await this.db('order_details')
+                                        .join('orders', 'order_details.order_id', 'orders.id')
+                                        .select('order_details.*', 'orders.stadium_id', 'orders.player_id')
+                                        .where('orders.stadium_id', stadiumId)
+                                        .where('order_details.date', date)
                                         
             return orders;
         } catch (error) {
