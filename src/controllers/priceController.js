@@ -34,7 +34,9 @@ class PriceController{
         try {
             const {stadiumId} = req.params;
             console.log(req.query);
-            const {dayOfWeek, orderType, date} = req.query;
+            const {dayOfWeek, orderType} = req.query;
+            const date = req.date || new Date();
+            console.log(date);
             // console.log(date, dayOfWeek);
             // if(!date) return next(errorHandler(401, 'date is not valid or empty'));
             
