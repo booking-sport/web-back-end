@@ -119,7 +119,7 @@ class StadiumService {
             const managers = await this.db('stadiums_managers')
                                         .select('manager_id')
                                         .where('stadiums_managers.stadium_id', stadiumId)
-            return managers;
+            return managers.map((manager) => manager.manager_id);
         } catch (error) {
             throw errorHandler(503, error.message);
         }
