@@ -45,6 +45,16 @@ class StadiumController {
             next(error);
         }
     }
+
+    getPaymentInfo = async (req,res,next) => {
+        try {
+            const stadiumId = req.params.stadiumId;
+            const info = await this.stadiumService.paymentInfo(stadiumId);
+            res.status(200).json({data: info});
+        } catch (error) {
+            next(error);
+        }
+    }
     
     create = async (req,res,next) => {
         try {

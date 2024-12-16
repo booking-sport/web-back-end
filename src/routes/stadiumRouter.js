@@ -1,10 +1,12 @@
 const router = require('express').Router();
 const stadiumController = require('../controllers/stadiumController');
+const stadiumService = require('../services/stadiumService');
 
 router.get('/all', stadiumController.getAll);
 router.get('/manager', stadiumController.getSelfStadium);
 router.get('/:stadiumId', stadiumController.getOneStadium);
 router.get('/:stadiumId/fields', stadiumController.getFields);
+router.get('/:stadiumId/payment-info', stadiumController.getPaymentInfo);
 
 router.post('/', stadiumController.create);
 router.post('/:stadiumId/field', stadiumController.addField);

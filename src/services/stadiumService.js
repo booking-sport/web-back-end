@@ -134,6 +134,21 @@ class StadiumService {
         }
     }
 
+    paymentInfo = async (stadiumId) => {
+        try {
+            const info = await this.db('stadiums_managers')
+                                    .join('stadiums', 'stadiums.id', 'stadiums_managers.stadium_id')
+                                    .join('managers', 'stadiums_managers.manager_id', 'managers.id')
+                                    .select('managers.full_name', 'stadiums.bank', 'stadiums.bank_account')
+                                    .where('stadiums_managers.stadium_id', stadiumId)
+                                    .where('stadiums_managers.role', 'owner')
+                                    .first();
+            return info;
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
 
     saveStadium = async (stadium) => {
         try {
