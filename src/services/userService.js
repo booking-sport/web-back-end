@@ -28,10 +28,12 @@ class UserService {
 
     findPlayerbyEmail = async (playerEmail) => {
         try {
-            return await this.db('players')
+            const user =  await this.db('players')
                             .select('*')
                             .where('email',playerEmail)
                             .first();
+            console.log(user);
+            return user;
         } catch (error) {
             throw errorHandler(503, error.message);
         }
@@ -42,28 +44,36 @@ class UserService {
             const {fullName, email, hashedPassword, phoneNumber} = player;
             const newUserId = await this.db('players')
                                         .insert({full_name: fullName, email, password: hashedPassword, phone_number: phoneNumber});
-            return newUserId;
+            return newUserId.at(0);
         } catch (error) {
             throw errorHandler(503, error.message);
         }
         
     }
 
-    updatePlayer = async (player) => {
+    savePlayerNoPassword = async (player) => {
         try {
-            const {playerId} = player;
+            const {fullName, phoneNumber} = player;
+            const newUserId = await this.db('players').insert({full_name: fullName, phone_number: phoneNumber});
+            return newUserId.at(0);
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
 
-            const newPlayer = {};
-            if(player.fullName) newPlayer.full_name = player.fullName;
-            if(player.email) newPlayer.email = player.email;
-            if(player.hashedPassword) newPlayer.password = player.hashedPassword;
-            if(player.phoneNumber) newPlayer.phone_number = player.phoneNumber;
+    updatePlayer = async (playerId, newPlayer) => {
+        try {
+            const conditions = {};
+            console.log(newPlayer);
+            newPlayer.fullName && (conditions.full_name = newPlayer.fullName);
+            newPlayer.hashedPassword && (conditions.password = newPlayer.hashedPassword);
+            newPlayer.phoneNumber && (conditions.phone_number = newPlayer.phoneNumber);
 
             await this.db('players')
                         .where('id', playerId)
-                        .update(newPlayer)
+                        .update(conditions)
 
-            return await this.db('players').select('*').where('id', managerId);
+            return await this.db('players').select('*').where('id', playerId);
         } catch (error) {
             throw errorHandler(503, error.message, error.errors);
         }
@@ -116,6 +126,7 @@ class UserService {
                                         .join('stadiums_managers', 'stadiums_managers.manager_id', 'managers.id')
                                         .select('managers.*')
                                         .where('stadiums_managers.stadium_id', stadiumId)
+                                        .where('stadiums_managers.role', 'owner')
                                         .first()
 
             return owner;

@@ -1,3 +1,4 @@
+const { errorHandler } = require('../helpers/errorHandler');
 const priceService = require('../services/priceService');
 
 class PriceController{
@@ -8,9 +9,10 @@ class PriceController{
     create = async (req,res,next) => {
         try {
             const stadiumId = req.params.stadiumId;
+            const fieldId = req.params.fieldId;
             const data = req.body;
             const priceCammelCase = this.convertCammelCase(data);
-            const priceToSave = {stadium_id: stadiumId, ...priceCammelCase};
+            const priceToSave = {stadium_id: stadiumId, field_id: fieldId, ...priceCammelCase};
             const newPriceId = await this.priceService.saveAprice(priceToSave);
             res.status(200).json({data: newPriceId});
         } catch (error) {
@@ -31,9 +33,14 @@ class PriceController{
     getPriceByDay = async (req,res,next) => {
         try {
             const {stadiumId} = req.params;
+            console.log(req.query);
             const {dayOfWeek, orderType} = req.query;
+            const date = req.query.date || (new Date()).toISOString().split('T')[0];
+            console.log('...date: ', date);
+            // console.log(date, dayOfWeek);
+            // if(!date) return next(errorHandler(401, 'date is not valid or empty'));
             
-            const prices = await this.priceService.detailDailyPriceByStadiumId(stadiumId, dayOfWeek, orderType);
+            const prices = await this.priceService.detailDailyPriceByStadiumId(stadiumId, dayOfWeek, orderType, date);
             res.status(200).json({data: prices});
         } catch (error) {
             next(error);

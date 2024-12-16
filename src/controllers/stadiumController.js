@@ -45,6 +45,16 @@ class StadiumController {
             next(error);
         }
     }
+
+    getPaymentInfo = async (req,res,next) => {
+        try {
+            const stadiumId = req.params.stadiumId;
+            const info = await this.stadiumService.paymentInfo(stadiumId);
+            res.status(200).json({data: info});
+        } catch (error) {
+            next(error);
+        }
+    }
     
     create = async (req,res,next) => {
         try {
@@ -52,6 +62,17 @@ class StadiumController {
             const stadium = this.convertCammelCase(stadiumCammelCase);
             const newStadiumId = await this.stadiumService.saveStadium(stadium);
             res.status(200).json({data: newStadiumId});
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    addField = async (req,res,next) => {
+        try {
+            const stadiumId = req.params.stadiumId;
+            const field = req.body;
+            const newFieldId = await this.stadiumService.saveField(stadiumId, field);
+            res.status(200).json({data: newFieldId});
         } catch (error) {
             next(error);
         }
