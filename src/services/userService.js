@@ -61,21 +61,19 @@ class UserService {
         }
     }
 
-    updatePlayer = async (player) => {
+    updatePlayer = async (playerId, newPlayer) => {
         try {
-            const {playerId} = player;
-
-            const newPlayer = {};
-            if(player.fullName) newPlayer.full_name = player.fullName;
-            if(player.email) newPlayer.email = player.email;
-            if(player.hashedPassword) newPlayer.password = player.hashedPassword;
-            if(player.phoneNumber) newPlayer.phone_number = player.phoneNumber;
+            const conditions = {};
+            console.log(newPlayer);
+            newPlayer.fullName && (conditions.full_name = newPlayer.fullName);
+            newPlayer.hashedPassword && (conditions.password = newPlayer.hashedPassword);
+            newPlayer.phoneNumber && (conditions.phone_number = newPlayer.phoneNumber);
 
             await this.db('players')
                         .where('id', playerId)
-                        .update(newPlayer)
+                        .update(conditions)
 
-            return await this.db('players').select('*').where('id', managerId);
+            return await this.db('players').select('*').where('id', playerId);
         } catch (error) {
             throw errorHandler(503, error.message, error.errors);
         }
@@ -128,6 +126,7 @@ class UserService {
                                         .join('stadiums_managers', 'stadiums_managers.manager_id', 'managers.id')
                                         .select('managers.*')
                                         .where('stadiums_managers.stadium_id', stadiumId)
+                                        .where('stadiums_managers.role', 'owner')
                                         .first()
 
             return owner;

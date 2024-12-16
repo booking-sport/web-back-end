@@ -86,12 +86,14 @@ class PlayerController {
     update = async (req,res,next) => {
         try {
             const playerId = req.params.playerId;
-            const {fullName, email, password, phoneNumber} = req.body;
-
+            const {fullName, oldPassword, newPassword, phoneNumber} = req.body;
             let hashedPassword;
-            if(password) hashedPassword = bcryptjs.hashSync(password);
 
-            const newPlayer = await this.userService.updatePlayer({playerId,fullName,email,hashedPassword,phoneNumber});
+            const player = await this.userService.findPlayerbyId(playerId);
+            if(oldPassword && !bcryptjs.compareSync(oldPassword, player.password)) return next(errorHandler(403, 'current password is invalid'));
+            if(newPassword) hashedPassword = bcryptjs.hashSync(newPassword);
+
+            const newPlayer = await this.userService.updatePlayer(playerId, {fullName, hashedPassword, phoneNumber});
             res.status(200).json({data: newPlayer});
         } catch (error) {
             next(error);
