@@ -28,10 +28,12 @@ class UserService {
 
     findPlayerbyEmail = async (playerEmail) => {
         try {
-            return await this.db('players')
+            const user =  await this.db('players')
                             .select('*')
                             .where('email',playerEmail)
                             .first();
+            console.log(user);
+            return user;
         } catch (error) {
             throw errorHandler(503, error.message);
         }
@@ -42,11 +44,21 @@ class UserService {
             const {fullName, email, hashedPassword, phoneNumber} = player;
             const newUserId = await this.db('players')
                                         .insert({full_name: fullName, email, password: hashedPassword, phone_number: phoneNumber});
-            return newUserId;
+            return newUserId.at(0);
         } catch (error) {
             throw errorHandler(503, error.message);
         }
         
+    }
+
+    savePlayerNoPassword = async (player) => {
+        try {
+            const {fullName, phoneNumber} = player;
+            const newUserId = await this.db('players').insert({full_name: fullName, phone_number: phoneNumber});
+            return newUserId.at(0);
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
     }
 
     updatePlayer = async (player) => {

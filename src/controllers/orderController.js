@@ -1,5 +1,6 @@
 const { errorHandler } = require('../helpers/errorHandler');
 const orderService = require('../services/orderService');
+const userService = require('../services/userService');
 
 class OrderController {
     constructor(){
@@ -60,9 +61,12 @@ class OrderController {
 
     createOrder = async (req,res,next) => {
         try {
-            // const playerId = req.user.player_id;
-            const playerId  = 1;
-            const {orders, note} = req.body;
+            let playerId = req.user ? req.user.player_id : undefined;
+            // const playerId  = 1;
+            const {orders, note, fullName, phoneNumber} = req.body;
+            console.log(phoneNumber);
+            if(!playerId) playerId = await userService.savePlayerNoPassword({fullName, phoneNumber});
+
             const stadiumId = req.params.stadiumId;
             
             if(!orders || orders.length == 0) return next(errorHandler(402, 'orders can not be empty'));
