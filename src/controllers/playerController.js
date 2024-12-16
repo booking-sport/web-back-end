@@ -49,17 +49,28 @@ class PlayerController {
 
     login = async (req,res,next) => {
         try {
+            
             const {email, password} = req.body;
+            console.log(email, password);
+            if(!email || !password) return next(errorHandler(401, 'invalid email or password field'));
 
             const player = await this.userService.findPlayerbyEmail(email);
             if(!player) return next(errorHandler(403, 'email not found'));
+
             if(!bcryptjs.compareSync(password, player.password)) return next(errorHandler(403, 'password is invalid'));
 
             const userTokenData = {player_id: player.id, phone_number: player.phone_number, email, full_name: player.full_name};
             const token = this.authService.signToken(userTokenData);
-
+           
             res.cookie('jwt', token);
-            res.status(200).json({data: token});
+            console.log(userTokenData);
+            res.status(200).json(
+                {
+                data: {
+                    token,
+                    user: userTokenData,
+                }
+                });
         } 
         catch (error) {
             next(error);
@@ -69,7 +80,7 @@ class PlayerController {
     logOut = (req,res,next) => {
         try {
             res.clearCookie('jwt');
-            res.status(200).json({succeess: true});
+            res.status(200).json({success: true});
         } catch (error) {
             next(error);
         }
