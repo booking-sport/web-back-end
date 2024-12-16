@@ -8,6 +8,7 @@ const stadiumRouter = require('./routes/stadiumRouter');
 const commentRouter = require('./routes/commentRouter');
 const orderRouter = require('./routes/orderRouter');
 const priceRouter = require('./routes/priceRouter');
+// const vietQrRouter = require('./routes/vietQrRouter');
 
 require('dotenv').config();
 
@@ -16,15 +17,18 @@ const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: false }));
+// app.use(express.urlencoded({ extended: false }));
 
 app.use(
   cors({
     credentials: true,
-    // TODO: change origin on deployment
-    origin: "http://localhost:3000",
+    origin: ['http://localhost:3000', 'http://192.168.101.70:3000'],
   })
 );
+
+app.get('/', (req,res) => {
+  res.status(200).json('Welcome to back end development');
+})
 
 app.use('/api/players', playerRouter);
 app.use('/api/managers', managerRouter);
@@ -33,6 +37,7 @@ app.use('/api/stadiums', stadiumRouter);
 app.use('/api/comments', commentRouter);
 app.use('/api/orders', orderRouter);
 app.use('/api/price', priceRouter);
+// app.use('/vqr', vietQrRouter);
 
 app.listen(PORT, () => {
     console.log(`server is running on ${PORT}`);
