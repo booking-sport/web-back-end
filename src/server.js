@@ -19,12 +19,9 @@ app.use(express.json());
 app.use(cookieParser());
 // app.use(express.urlencoded({ extended: false }));
 
-app.use(
-  cors({
-    credentials: true,
-    origin: ['http://localhost:3000', 'http://192.168.101.70:3000'],
-  })
-);
+app.use(cors({
+    origin: '*'
+  }));
 
 app.get('/', (req,res) => {
   res.status(200).json('Welcome to back end development');
