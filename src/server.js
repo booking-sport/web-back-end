@@ -8,7 +8,7 @@ const stadiumRouter = require('./routes/stadiumRouter');
 const commentRouter = require('./routes/commentRouter');
 const orderRouter = require('./routes/orderRouter');
 const priceRouter = require('./routes/priceRouter');
-// const vietQrRouter = require('./routes/vietQrRouter');
+const paymentRouter = require('./routes/paymentRouter');
 
 require('dotenv').config();
 
@@ -34,7 +34,7 @@ app.use('/api/stadiums', stadiumRouter);
 app.use('/api/comments', commentRouter);
 app.use('/api/orders', orderRouter);
 app.use('/api/price', priceRouter);
-// app.use('/vqr', vietQrRouter);
+app.use('/api/payment', paymentRouter);
 
 app.listen(PORT, () => {
     console.log(`server is running on ${PORT}`);
