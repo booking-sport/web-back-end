@@ -88,7 +88,7 @@ class OrderController {
       bigOrder.player_id = playerId;
       bigOrder.note = note;
       bigOrder.is_created_by_player = true;
-      bigOrder.status = "pending";
+      bigOrder.order_status = "pending";
       console.log(bigOrder);
 
       const orderId = await this.orderService.saveOrder(bigOrder);
