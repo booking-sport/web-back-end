@@ -1,6 +1,7 @@
 const { errorHandler } = require("../helpers/errorHandler");
 const orderService = require("../services/orderService");
 const userService = require("../services/userService");
+const payOS = require("../services/payos");
 
 class OrderController {
   constructor() {
@@ -88,7 +89,7 @@ class OrderController {
       bigOrder.player_id = playerId;
       bigOrder.note = note;
       bigOrder.is_created_by_player = true;
-      bigOrder.order_status = "pending";
+      bigOrder.payment_status = "pending";
       console.log(bigOrder);
 
       const orderId = await this.orderService.saveOrder(bigOrder);
@@ -176,7 +177,6 @@ class OrderController {
 
       order_id: orderDetails.orderId,
       stadium_id: orderDetails.stadiumId,
-      order_status: orderDetails.orderStatus,
     };
   }
 }
