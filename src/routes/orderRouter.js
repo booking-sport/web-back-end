@@ -13,8 +13,8 @@ router.post('/stadium/:stadiumId', orderController.createOrder);
 
 
 //just to update status from player
-router.put('/:orderId', orderController.updateOrder);
-router.put("/cancel/:orderId", orderController.cancelBigOrder);
+router.put('/detail/:orderId', orderController.updateOrder);
+router.put("/:orderId", orderController.updateBigOrder);
 // update order only for manager
 router.put('/manager/:orderId', orderController.updateOrder);
 

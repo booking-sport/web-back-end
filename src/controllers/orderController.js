@@ -131,11 +131,12 @@ class OrderController {
     }
   };
 
-  cancelBigOrder = async (req, res, next) => {
+  updateBigOrder = async (req, res, next) => {
     try {
       const orderId = req.params.orderId;
-      const newOrder = await orderService.updateBigOrder(orderId, {order_status: 'cancel'});
-      res.status(200).json({data: newOrder});
+      const newOrder = req.body;
+      const updatedOrder = await orderService.updateBigOrder(orderId, {payment_status: newOrder.paymentStatus});
+      res.status(200).json({data: updatedOrder});
     } catch (error) {
       next(error);
     }

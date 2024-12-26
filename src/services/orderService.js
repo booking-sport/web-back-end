@@ -33,7 +33,7 @@ class OrderService {
 
   findOneBigOrder = async (orderId) => {
     try {
-      const order = await this.db("orders").select("*").where("orders.id",id).first();
+      const order = await this.db("orders").select("*").where("id", orderId).first();
       return order;
     } catch (error) {
       throw errorHandler(503, error.message);
@@ -117,12 +117,12 @@ class OrderService {
   };
 
   updateBigOrder = async (orderId, newOrder) => {
-    try {
-      await this.db("orders").where("id", orderId).update(newOrder);
-      return await this.findOneBigOrder(orderId);
-    } catch (error) {
-      throw errorHandler(503, error.message);
-    }
+     try {
+       await this.db("orders").where("id", orderId).update(newOrder);
+       return await this.findOneBigOrder(orderId);
+     } catch (error) {
+       throw errorHandler(503, error.message);
+     }
   };
 
   saveOrderDetails = async (orderDetails) => {
