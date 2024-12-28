@@ -82,7 +82,7 @@ class OrderService {
         .select("order_details.*", "orders.stadium_id", "orders.player_id")
         .where("orders.stadium_id", stadiumId)
         .where("order_details.date", date)
-        .where("order_details.order_status", 'success');
+        .where("order_details.order_status", "success");
 
       return orders;
     } catch (error) {
@@ -158,6 +158,15 @@ class OrderService {
   updateOrder = async (orderId, newOrder) => {
     try {
       await this.db("order_details").where("id", orderId).update(newOrder);
+      return await this.findOneOrder(orderId);
+    } catch (error) {
+      throw errorHandler(503, error.message);
+    }
+  };
+
+  updateOrderDetailsFromBigOrder = async (orderId, condition) => {
+    try {
+      await this.db("order_details").where("order_id", orderId).update(condition);
       return await this.findOneOrder(orderId);
     } catch (error) {
       throw errorHandler(503, error.message);

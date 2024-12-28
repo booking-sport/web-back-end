@@ -135,8 +135,15 @@ class OrderController {
     try {
       const orderId = req.params.orderId;
       const newOrder = req.body;
-      const updatedOrder = await orderService.updateBigOrder(orderId, {payment_status: newOrder.paymentStatus});
-      res.status(200).json({data: updatedOrder});
+      const updatedOrder = await orderService.updateBigOrder(orderId, {
+        payment_status: newOrder.paymentStatus,
+      });
+      const orderStatus =
+        newOrder.paymentStatus == "paid" ? "success" : "canceled";
+      await orderService.updateOrderDetailsFromBigOrder(orderId, {
+        order_status: orderStatus,
+      });
+      res.status(200).json({ data: updatedOrder });
     } catch (error) {
       next(error);
     }
