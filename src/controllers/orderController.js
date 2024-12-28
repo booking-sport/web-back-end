@@ -64,7 +64,7 @@ class OrderController {
     try {
       let playerId = req.user ? req.user.player_id : undefined;
       // const playerId  = 1;
-      const { orders, note, fullName, phoneNumber } = req.body;
+      const { orders, note, fullName, phoneNumber, deposit } = req.body;
       console.log(phoneNumber);
       if (!playerId)
         playerId = await userService.savePlayerNoPassword({
@@ -84,12 +84,15 @@ class OrderController {
         obj.order_type = order.orderType;
         return obj;
       }, {});
-
+      
+      bigOrder.total_price = Math.floor(bigOrder.total_price * deposit / 100);
       bigOrder.stadium_id = stadiumId;
       bigOrder.player_id = playerId;
       bigOrder.note = note;
       bigOrder.is_created_by_player = true;
       bigOrder.payment_status = "pending";
+      bigOrder.deposit = deposit;
+      
       console.log(bigOrder);
 
       const orderId = await this.orderService.saveOrder(bigOrder);
