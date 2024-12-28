@@ -36,9 +36,6 @@ class PriceController{
             console.log(req.query);
             const {dayOfWeek, orderType} = req.query;
             const date = req.query.date || (new Date()).toISOString().split('T')[0];
-            console.log('...date: ', date);
-            // console.log(date, dayOfWeek);
-            // if(!date) return next(errorHandler(401, 'date is not valid or empty'));
             
             const prices = await this.priceService.detailDailyPriceByStadiumId(stadiumId, dayOfWeek, orderType, date);
             res.status(200).json({data: prices});
