@@ -84,27 +84,29 @@ class OrderController {
         obj.order_type = order.orderType;
         return obj;
       }, {});
-      
-      bigOrder.total_price = Math.floor(bigOrder.total_price * deposit / 100);
+
+      bigOrder.total_price = Math.floor((bigOrder.total_price * deposit) / 100);
       bigOrder.stadium_id = stadiumId;
       bigOrder.player_id = playerId;
       bigOrder.note = note;
       bigOrder.is_created_by_player = true;
       bigOrder.payment_status = "pending";
       bigOrder.deposit = deposit;
-      
+
       console.log(bigOrder);
 
-      const orderId = await this.orderService.saveOrder(bigOrder);
+      // const orderId = await this.orderService.saveOrder(bigOrder);
 
       const ordersToSave = orders.map((order) => {
         return this.convertOrderDetailCammelCase({
           ...order,
           stadiumId,
-          orderId,
         });
       });
-      await this.orderService.saveOrderDetails(ordersToSave);
+      const { orderId, orderDetailsIds } =
+        await this.orderService.saveOrderWithDetails(bigOrder, ordersToSave);
+
+      console.log(orderId, orderDetailsIds);
 
       const paymentLinkRes = await payOS.createPaymentLink({
         orderCode: orderId,

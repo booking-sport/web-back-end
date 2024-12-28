@@ -144,6 +144,34 @@ class OrderService {
     }
   };
 
+  saveOrderWithDetails = async (order, ordersToSave) => {
+    const trx = await this.db.transaction();
+
+    try {
+
+      const [orderId] = await trx("orders").insert(order);
+
+      const ordersWithOrderId = ordersToSave.map((orderDetail) => ({
+        ...orderDetail,
+        order_id: orderId,
+      }));
+
+      const orderDetailsIds = await trx("order_details").insert(
+        ordersWithOrderId
+      );
+      await trx.commit();
+
+      return {
+        orderId,
+        orderDetailsIds, // Array of IDs for the inserted order details
+      };
+    } catch (error) {
+      // Rollback the transaction in case of error
+      await trx.rollback();
+      throw errorHandler(503, error.message);
+    }
+  };
+
   saveOrderDetails = async (orderDetails) => {
     try {
       const orderDetailsId = await this.db("order_details").insert(
@@ -166,7 +194,9 @@ class OrderService {
 
   updateOrderDetailsFromBigOrder = async (orderId, condition) => {
     try {
-      await this.db("order_details").where("order_id", orderId).update(condition);
+      await this.db("order_details")
+        .where("order_id", orderId)
+        .update(condition);
       return await this.findOneOrder(orderId);
     } catch (error) {
       throw errorHandler(503, error.message);
