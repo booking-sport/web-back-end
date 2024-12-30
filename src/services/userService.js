@@ -135,6 +135,22 @@ class UserService {
         }
     }
 
+    findAllOwners = async () => {
+        try {
+            const owners = await this.db("managers")
+              .join(
+                "stadiums_managers",
+                "stadiums_managers.manager_id",
+                "managers.id"
+              )
+              .select("managers.*", "stadiums_managers.stadium_id")
+              .where("stadiums_managers.role", "owner")
+            return owners;
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
+
     saveManager = async (manager) => {
         try {
             const {fullName, email, hashedPassword, phoneNumber} = manager;

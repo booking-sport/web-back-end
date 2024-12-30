@@ -1,13 +1,20 @@
-const router = require('express').Router();
-const orderService = require('../services/orderService');
+const router = require("express").Router();
+const payOS = require("../services/payos");
 
-// https://0f9f-171-241-47-243.ngrok-free.app/receive-hook
-router.post("/receive-hook", async (req, res) => {
-  const order = req.body;
-  const success = order.success;
-  if(success) {
-    const orderId = order.data.orderCode;
-    await orderService.updateBigOrder(orderId, {order_status: 'success'});
+router.get("/:orderId", async (req, res, next) => {
+  try {
+    const orderId = req.params.orderId;
+    const order = await payOS.getPaymentLinkInformation(orderId);
+    if (!order) {
+      return res.json({
+        error: -1,
+        message: "failed",
+        data: null,
+      });
+    }
+    res.status(200).json({ data: order });
+  } catch (error) {
+    next(error);
   }
 });
 

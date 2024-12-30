@@ -33,7 +33,10 @@ class OrderService {
 
   findOneBigOrder = async (orderId) => {
     try {
-      const order = await this.db("orders").select("*").where("orders.id",id).first();
+      const order = await this.db("orders")
+        .select("*")
+        .where("id", orderId)
+        .first();
       return order;
     } catch (error) {
       throw errorHandler(503, error.message);
@@ -64,6 +67,22 @@ class OrderService {
         .select("order_details.*", "orders.stadium_id", "orders.player_id")
         .where("orders.stadium_id", stadiumId)
         .where("order_details.date", date);
+
+      return orders;
+    } catch (error) {
+      throw errorHandler(503, error.message);
+    }
+  };
+
+  findOrderSuccessToday = async (stadiumId, date) => {
+    try {
+      console.log(stadiumId, date);
+      const orders = await this.db("order_details")
+        .join("orders", "order_details.order_id", "orders.id")
+        .select("order_details.*", "orders.stadium_id", "orders.player_id")
+        .where("orders.stadium_id", stadiumId)
+        .where("order_details.date", date)
+        .where("order_details.order_status", "success");
 
       return orders;
     } catch (error) {
@@ -125,6 +144,34 @@ class OrderService {
     }
   };
 
+  saveOrderWithDetails = async (order, ordersToSave) => {
+    const trx = await this.db.transaction();
+
+    try {
+
+      const [orderId] = await trx("orders").insert(order);
+
+      const ordersWithOrderId = ordersToSave.map((orderDetail) => ({
+        ...orderDetail,
+        order_id: orderId,
+      }));
+
+      const orderDetailsIds = await trx("order_details").insert(
+        ordersWithOrderId
+      );
+      await trx.commit();
+
+      return {
+        orderId,
+        orderDetailsIds, // Array of IDs for the inserted order details
+      };
+    } catch (error) {
+      // Rollback the transaction in case of error
+      await trx.rollback();
+      throw errorHandler(503, error.message);
+    }
+  };
+
   saveOrderDetails = async (orderDetails) => {
     try {
       const orderDetailsId = await this.db("order_details").insert(
@@ -139,6 +186,17 @@ class OrderService {
   updateOrder = async (orderId, newOrder) => {
     try {
       await this.db("order_details").where("id", orderId).update(newOrder);
+      return await this.findOneOrder(orderId);
+    } catch (error) {
+      throw errorHandler(503, error.message);
+    }
+  };
+
+  updateOrderDetailsFromBigOrder = async (orderId, condition) => {
+    try {
+      await this.db("order_details")
+        .where("order_id", orderId)
+        .update(condition);
       return await this.findOneOrder(orderId);
     } catch (error) {
       throw errorHandler(503, error.message);

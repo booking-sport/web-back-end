@@ -1,6 +1,7 @@
 const { errorHandler } = require("../helpers/errorHandler");
 const orderService = require("../services/orderService");
 const userService = require("../services/userService");
+const payOS = require("../services/payos");
 
 class OrderController {
   constructor() {
@@ -63,7 +64,7 @@ class OrderController {
     try {
       let playerId = req.user ? req.user.player_id : undefined;
       // const playerId  = 1;
-      const { orders, note, fullName, phoneNumber } = req.body;
+      const { orders, note, fullName, phoneNumber, deposit } = req.body;
       console.log(phoneNumber);
       if (!playerId)
         playerId = await userService.savePlayerNoPassword({
@@ -84,23 +85,28 @@ class OrderController {
         return obj;
       }, {});
 
+      bigOrder.total_price = Math.floor((bigOrder.total_price * deposit) / 100);
       bigOrder.stadium_id = stadiumId;
       bigOrder.player_id = playerId;
       bigOrder.note = note;
       bigOrder.is_created_by_player = true;
-      bigOrder.order_status = "pending";
+      bigOrder.payment_status = "pending";
+      bigOrder.deposit = deposit;
+
       console.log(bigOrder);
 
-      const orderId = await this.orderService.saveOrder(bigOrder);
+      // const orderId = await this.orderService.saveOrder(bigOrder);
 
       const ordersToSave = orders.map((order) => {
         return this.convertOrderDetailCammelCase({
           ...order,
           stadiumId,
-          orderId,
         });
       });
-      await this.orderService.saveOrderDetails(ordersToSave);
+      const { orderId, orderDetailsIds } =
+        await this.orderService.saveOrderWithDetails(bigOrder, ordersToSave);
+
+      console.log(orderId, orderDetailsIds);
 
       const paymentLinkRes = await payOS.createPaymentLink({
         orderCode: orderId,
@@ -130,11 +136,19 @@ class OrderController {
     }
   };
 
-  cancelBigOrder = async (req, res, next) => {
+  updateBigOrder = async (req, res, next) => {
     try {
       const orderId = req.params.orderId;
-      const newOrder = await orderService.updateBigOrder(orderId, {order_status: 'cancel'});
-      res.status(200).json({data: newOrder});
+      const newOrder = req.body;
+      const updatedOrder = await orderService.updateBigOrder(orderId, {
+        payment_status: newOrder.paymentStatus,
+      });
+      const orderStatus =
+        newOrder.paymentStatus == "paid" ? "success" : "canceled";
+      await orderService.updateOrderDetailsFromBigOrder(orderId, {
+        order_status: orderStatus,
+      });
+      res.status(200).json({ data: updatedOrder });
     } catch (error) {
       next(error);
     }
@@ -176,7 +190,6 @@ class OrderController {
 
       order_id: orderDetails.orderId,
       stadium_id: orderDetails.stadiumId,
-      order_status: orderDetails.orderStatus,
     };
   }
 }

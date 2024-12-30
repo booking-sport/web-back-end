@@ -51,7 +51,7 @@ class PriceService {
                                         .select('*')
                                         .where(conditions)
             
-            const orders = await orderService.findOrderToday(stadiumId, date);
+            const orders = await orderService.findOrderSuccessToday(stadiumId, date);
             const fields = await stadiumService.findFieldsByStadiumId(stadiumId);
 
             console.log(orders);
