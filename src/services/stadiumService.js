@@ -17,9 +17,16 @@ class StadiumService {
                                                 if(name) query.where('name', 'like', `%${name}%`);
                                             })
             const images = await this.findImagesByAllStadium();
+            const owners = await userService.findAllOwners();
+            const mapOwners = owners.reduce((obj, record) => {
+                const stadiumId = record.stadium_id;
+                obj[stadiumId] = record;
+                return obj;
+            }, {})
             const stadiums = records.map((record) => {
                 const imageStadium = images[record.id] ? images[record.id] : [];
-                return {...record, "images": imageStadium};
+                const owner = mapOwners[record.id];
+                return {...record, "images": imageStadium, owner};
             });
             return stadiums;
         } catch (error) {
