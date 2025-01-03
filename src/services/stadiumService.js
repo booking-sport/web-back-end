@@ -23,10 +23,22 @@ class StadiumService {
                 obj[stadiumId] = record;
                 return obj;
             }, {})
+            const rows = await commentService.countRatingsForAll();
+            const allRatings = {};
+            rows.forEach((row) => {
+              if (!allRatings[row.stadium_id]) {
+                allRatings[row.stadium_id] = [];
+              }
+              allRatings[row.stadium_id].push({
+                rate: row.rate,
+                count: row.count,
+              });
+            });
             const stadiums = records.map((record) => {
                 const imageStadium = images[record.id] ? images[record.id] : [];
                 const owner = mapOwners[record.id];
-                return {...record, "images": imageStadium, owner};
+                const ratings = allRatings[record.id] ? allRatings[record.id] : [];
+                return {...record, "images": imageStadium, owner, ratings};
             });
             return stadiums;
         } catch (error) {
