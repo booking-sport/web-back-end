@@ -37,7 +37,7 @@ class PriceController{
             const {dayOfWeek, orderType} = req.query;
             const date = req.query.date || (new Date()).toISOString().split('T')[0];
             
-            const prices = await this.priceService.detailDailyPriceByStadiumId(stadiumId, dayOfWeek, orderType, date);
+            const prices = await this.priceService.detailDailyPriceByStadiumId_version2(stadiumId, dayOfWeek, orderType, date);
             res.status(200).json({data: prices});
         } catch (error) {
             next(error);
