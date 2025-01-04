@@ -41,8 +41,7 @@ class OrderController {
   getOrdersForManager = async (req, res, next) => {
     try {
       req.user = {};
-      const managerId = req.user.manager_id || 1;
-      // console.log(managerId);
+      const managerId = req.user.manager_id;
       const orders = await this.orderService.findSelfOrdersByManager(managerId);
       res.status(200).json({ data: orders });
     } catch (error) {
@@ -63,7 +62,6 @@ class OrderController {
   createOrder = async (req, res, next) => {
     try {
       let playerId = req.user ? req.user.player_id : undefined;
-      // const playerId  = 1;
       const { orders, note, fullName, phoneNumber, deposit } = req.body;
       console.log(phoneNumber);
       if (!playerId)
@@ -94,9 +92,7 @@ class OrderController {
       bigOrder.deposit = deposit;
 
       console.log(bigOrder);
-
-      // const orderId = await this.orderService.saveOrder(bigOrder);
-
+      
       const ordersToSave = orders.map((order) => {
         return this.convertOrderDetailCammelCase({
           ...order,
