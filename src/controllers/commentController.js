@@ -48,8 +48,7 @@ class CommentController {
     create = async (req,res,next) => {
         try {
             const stadiumId = req.params.stadiumId;
-            // const playerId = req.user.player_id;
-            const playerId = 7;
+            const playerId = req.user.player_id;
             const {comment, rate, images} = req.body;
 
             const newRecord = {comment, rate, stadium_id: stadiumId, player_id: playerId, images};
