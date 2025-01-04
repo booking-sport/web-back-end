@@ -39,150 +39,145 @@ class PriceService {
     //return details price for each unit on specific day -> 24 * 2  record 
     // return an array, length = 48
 
-    // detailDailyPriceByStadiumId = async (stadiumId, dayOfWeek = 'monday', orderType = 'single_booking', date) => {
-    //     try {
-    //         const conditions = {
-    //             stadium_id: stadiumId,
-    //         }
-    //         if(dayOfWeek) conditions['day_of_week'] = dayOfWeek;
-    //         if(orderType) conditions['order_type'] = orderType;
+    detailDailyPriceByStadiumId = async (stadiumId, date, dayOfWeek = 'monday', orderType = 'single_booking') => {
+        try {
+            const conditions = {
+                stadium_id: stadiumId,
+            }
+            if(dayOfWeek) conditions['day_of_week'] = dayOfWeek;
+            if(orderType) conditions['order_type'] = orderType;
 
-    //         const prices = await this.db('prices')
-    //                                     .select('*')
-    //                                     .where(conditions)
+            const prices = await this.db('prices')
+                                        .select('*')
+                                        .where(conditions)
             
-    //         const orders = await orderService.findOrderSuccessToday(stadiumId, date);
-    //         const fields = await stadiumService.findFieldsByStadiumId(stadiumId);
+            const orders = await orderService.findOrderSuccessToday(stadiumId, date);
+            const fields = await stadiumService.findFieldsByStadiumId(stadiumId);
 
-    //         console.log(orders);
+            console.log(orders);
 
-    //         // console.log('prices', prices);
-    //         // console.log('orders', orders);
-    //         // console.log('fields', fields);
         
-    //         let unitPrices = {};
-    //         let unitOrders = {};
+            let unitPrices = {};
+            let unitOrders = {};
 
-    //         prices.forEach((price) => {
-    //             const beginShift = price.begin_shift;
-    //             const hourBegin = parseInt(beginShift.slice(0,2)), minuteBegin = parseInt(beginShift.slice(3,5));
-    //             const endShift = price.end_shift;
-    //             const hourEnd = parseInt(endShift.slice(0,2)), minuteEnd = parseInt(endShift.slice(3,5));
+            prices.forEach((price) => {
+                const beginShift = price.begin_shift;
+                const hourBegin = parseInt(beginShift.slice(0,2)), minuteBegin = parseInt(beginShift.slice(3,5));
+                const endShift = price.end_shift;
+                const hourEnd = parseInt(endShift.slice(0,2)), minuteEnd = parseInt(endShift.slice(3,5));
 
-    //             const startIndex = hourBegin*2 + minuteBegin/30;
-    //             const endIndex = hourEnd*2 + minuteEnd/30;
+                const startIndex = hourBegin*2 + minuteBegin/30;
+                const endIndex = hourEnd*2 + minuteEnd/30;
 
-    //             const fieldId = price.field_id;
-    //             if(!unitPrices[fieldId]) unitPrices[fieldId] = Array(48).fill(null);
+                const fieldId = price.field_id;
+                if(!unitPrices[fieldId]) unitPrices[fieldId] = Array(48).fill(null);
 
-    //             for(let i = startIndex; i < endIndex; i++){
-    //                 unitPrices[fieldId][i] = price.price_per_unit;
-    //             }
-    //         });
+                for(let i = startIndex; i < endIndex; i++){
+                    unitPrices[fieldId][i] = price.price_per_unit;
+                }
+            });
 
 
-    //         orders.forEach((order) => {
-    //             const beginTime = order.begin_time;
-    //             const hourBegin = parseInt(beginTime.slice(0,2)), minuteBegin = parseInt(beginTime.slice(3,5));
-    //             const endTime = order.end_time;
-    //             const hourEnd = parseInt(endTime.slice(0,2)), minuteEnd = parseInt(endTime.slice(3,5));
+            orders.forEach((order) => {
+                const beginTime = order.begin_time;
+                const hourBegin = parseInt(beginTime.slice(0,2)), minuteBegin = parseInt(beginTime.slice(3,5));
+                const endTime = order.end_time;
+                const hourEnd = parseInt(endTime.slice(0,2)), minuteEnd = parseInt(endTime.slice(3,5));
 
-    //             const startIndex = hourBegin*2 + minuteBegin/30;
-    //             const endIndex = hourEnd*2 + minuteEnd/30;
+                const startIndex = hourBegin*2 + minuteBegin/30;
+                const endIndex = hourEnd*2 + minuteEnd/30;
 
-    //             const fieldId = order.field_id;
-    //             console.log(fieldId);
-    //             if(!unitOrders[fieldId]) unitOrders[fieldId] = Array(48).fill(null);
+                const fieldId = order.field_id;
+                console.log(fieldId);
+                if(!unitOrders[fieldId]) unitOrders[fieldId] = Array(48).fill(null);
 
-    //             for(let i = startIndex; i < endIndex; i++){
-    //                 unitOrders[fieldId][i] = order.order_type;
-    //             }
-    //         });
+                for(let i = startIndex; i < endIndex; i++){
+                    unitOrders[fieldId][i] = order.order_type;
+                }
+            });
 
-    //         // console.log(unitOrders[1]);
 
-    //         let price = null, status = null, _orderType = null;
+            let price = null, status = null, _orderType = null;
 
-    //         const fieldUnitPrices = fields.map((field) => {
+            const fieldUnitPrices = fields.map((field) => {
 
-    //             let unit = Array(48).fill({});
-    //             // console.log(field);
-    //             const fieldId = field.id;
-    //             const fieldName = field.name;
-    //             const priceNow = unitPrices[fieldId];
-    //             const orderNow = unitOrders[fieldId];
+                let unit = Array(48).fill({});
 
-    //             // test
-    //             let startTime, endTime, rangeTime;
-    //             ///
-    //             // co set gia cho san nay
-    //             if(priceNow){
-    //                 for(let i=0; i<48; i++){
-    //                     let hours = Math.floor(i / 2).toString().padStart(2, '0');
-    //                     let minutes = (i % 2) * 30 === 0 ? '00' : '30';
-    //                     startTime = `${hours}:${minutes}`;
-    //                     hours = Math.floor((i+1) / 2).toString().padStart(2, '0');
-    //                     minutes = ((i+1) % 2) * 30 === 0 ? '00' : '30';
-    //                     endTime = `${hours}:${minutes}`;
-    //                     rangeTime = `${startTime} to ${endTime}`;
+                const fieldId = field.id;
+                const fieldName = field.name;
+                const priceNow = unitPrices[fieldId];
+                const orderNow = unitOrders[fieldId];
 
-    //                     if(priceNow[i]){
-    //                         price = priceNow[i];
-    //                         if(orderNow && orderNow[i]){
-    //                             status = 'booked';
-    //                             _orderType = orderNow[i];
-    //                         }
-    //                         else {
-    //                             status = 'available';
-    //                             _orderType = null;
-    //                         }
-    //                     }
-    //                     else {
-    //                         price = null;
-    //                         status = 'block';
-    //                         _orderType = null;
-    //                     }
-    //                     unit[i] = {
-    //                         price,
-    //                         status,
-    //                         "order_type": _orderType,
-    //                         rangeTime
-    //                     }
-    //                 }
-    //             }
-    //             else {
-    //                 for(let i=0; i<48; i++){
-    //                     let hours = Math.floor(i / 2).toString().padStart(2, '0');
-    //                     let minutes = (i % 2) * 30 === 0 ? '00' : '30';
-    //                     startTime = `${hours}:${minutes}`;
-    //                     hours = Math.floor((i+1) / 2).toString().padStart(2, '0');
-    //                     minutes = ((i+1) % 2) * 30 === 0 ? '00' : '30';
-    //                     endTime = `${hours}:${minutes}`;
-    //                     rangeTime = `${startTime} to ${endTime}`;
+                // test
+                let startTime, endTime, rangeTime;
+                // co set gia cho san nay
+                if(priceNow){
+                    for(let i=0; i<48; i++){
+                        let hours = Math.floor(i / 2).toString().padStart(2, '0');
+                        let minutes = (i % 2) * 30 === 0 ? '00' : '30';
+                        startTime = `${hours}:${minutes}`;
+                        hours = Math.floor((i+1) / 2).toString().padStart(2, '0');
+                        minutes = ((i+1) % 2) * 30 === 0 ? '00' : '30';
+                        endTime = `${hours}:${minutes}`;
+                        rangeTime = `${startTime} to ${endTime}`;
+
+                        if(priceNow[i]){
+                            price = priceNow[i];
+                            if(orderNow && orderNow[i]){
+                                status = 'booked';
+                                _orderType = orderNow[i];
+                            }
+                            else {
+                                status = 'available';
+                                _orderType = null;
+                            }
+                        }
+                        else {
+                            price = null;
+                            status = 'block';
+                            _orderType = null;
+                        }
+                        unit[i] = {
+                            price,
+                            status,
+                            "order_type": _orderType,
+                            rangeTime
+                        }
+                    }
+                }
+                else {
+                    for(let i=0; i<48; i++){
+                        let hours = Math.floor(i / 2).toString().padStart(2, '0');
+                        let minutes = (i % 2) * 30 === 0 ? '00' : '30';
+                        startTime = `${hours}:${minutes}`;
+                        hours = Math.floor((i+1) / 2).toString().padStart(2, '0');
+                        minutes = ((i+1) % 2) * 30 === 0 ? '00' : '30';
+                        endTime = `${hours}:${minutes}`;
+                        rangeTime = `${startTime} to ${endTime}`;
                         
-    //                     unit[i] = {
-    //                         price: null,
-    //                         status: 'block',
-    //                         "order_type": null,
-    //                         rangeTime
-    //                     }
-    //                 }
-    //             }
+                        unit[i] = {
+                            price: null,
+                            status: 'block',
+                            "order_type": null,
+                            rangeTime
+                        }
+                    }
+                }
                 
-    //             return {
-    //                 fieldId,
-    //                 fieldName,
-    //                 unit
-    //             }
-    //         });
+                return {
+                    fieldId,
+                    fieldName,
+                    unit
+                }
+            });
             
-    //         return fieldUnitPrices;
-    //     } catch (error) {
-    //         throw errorHandler(503, error.message);
-    //     }
-    // }
+            return fieldUnitPrices;
+        } catch (error) {
+            throw errorHandler(503, error.message);
+        }
+    }
 
-    detailDailyPriceByStadiumId_version2 = async (stadiumId, dayOfWeek = 'monday', orderType = 'single_booking', date) => {
+    detailDailyPriceByStadiumId_version2 = async (stadiumId, date, dayOfWeek = 'monday', orderType = 'single_booking') => {
         try {
             const conditions = this.buildConditions(stadiumId, dayOfWeek, orderType);
             const [prices, orders, fields] = await Promise.all([

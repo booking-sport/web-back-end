@@ -42,7 +42,8 @@ class CommentService {
   findByStadiumId = async (stadiumId) => {
     try {
       const rows = await this.db("comments")
-        .select("*")
+        .join("players", "comments.player_id", "players.id")
+        .select("comments.*", 'players.full_name', 'players.phone_number', 'players.email', 'players.avatar_url')
         .where("stadium_id", stadiumId);
       const allImages = await this.findImagesForAllComment();
 
