@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const orderController = require('../controllers/orderController');
-const {verifyToken} = require('../middlewares/auth')
+const {verifyToken, decodeToken} = require('../middlewares/auth')
 
 router.get('/all', orderController.getAll);
 router.get('/:orderId', orderController.getOne);
@@ -9,7 +9,7 @@ router.get('/self/manager', orderController.getOrdersForManager);
 router.get('/self/player', verifyToken, orderController.getOrdersForPlayer);
 
 
-router.post('/stadium/:stadiumId', orderController.createOrder);
+router.post("/stadium/:stadiumId", decodeToken, orderController.createOrder);
 
 
 //just to update status from player
