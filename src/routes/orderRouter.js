@@ -5,6 +5,7 @@ const {verifyToken, decodeToken} = require('../middlewares/auth')
 router.get('/all', orderController.getAll);
 router.get('/:orderId', orderController.getOne);
 router.get('/stadium/:stadiumId', orderController.getOrdersForOneStadium);
+router.get("/player/:playerId", orderController.getOrdersForOnePlayer);
 router.get('/self/manager', orderController.getOrdersForManager);
 router.get('/self/player', verifyToken, orderController.getOrdersForPlayer);
 

@@ -59,6 +59,22 @@ class OrderService {
     }
   };
 
+  findByOnePlayer = async (playerId, date) => {
+    try {
+      const orders = await this.db("order_details")
+        .join("orders", "order_details.order_id", "orders.id")
+        .select("order_details.*", "orders.stadium_id", "orders.player_id")
+        .where("orders.player_id", playerId)
+        .where((query) => {
+          if (date) query.where("order_details.date", date);
+        });
+
+      return orders;
+    } catch (error) {
+      throw errorHandler(503, error.message);
+    }
+  };
+
   findOrderToday = async (stadiumId, date) => {
     try {
       console.log(stadiumId, date);
@@ -148,7 +164,6 @@ class OrderService {
     const trx = await this.db.transaction();
 
     try {
-
       const [orderId] = await trx("orders").insert(order);
 
       const ordersWithOrderId = ordersToSave.map((orderDetail) => ({

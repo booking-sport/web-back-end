@@ -52,7 +52,19 @@ class OrderController {
   getOrdersForPlayer = async (req, res, next) => {
     try {
       const playerId = req.user.player_id;
-      const orders = await this.orderService.findByOnePlayer(playerId);
+      const date = req.query.date;
+      const orders = await this.orderService.findByOnePlayer(playerId, date);
+      res.status(200).json({ data: orders });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getOrdersForOnePlayer = async (req, res, next) => {
+    try {
+      const playerId = req.params.playerId;
+      const date = req.query.date;
+      const orders = await this.orderService.findByOnePlayer(playerId, date);
       res.status(200).json({ data: orders });
     } catch (error) {
       next(error);
