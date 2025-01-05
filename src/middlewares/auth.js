@@ -12,6 +12,7 @@ exports.verifyToken = (req, res, next) => {
   const token = authorizationHeader.split(" ")[1];
   if (!token) return next(errorHandler(403, "token not found"));
 
+  console.log(token);
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRETE, (err, user) => {
     if (err) return next(errorHandler(403, "token is invalid"));
     req.user = user;
@@ -27,6 +28,7 @@ exports.decodeToken = (req, res, next) => {
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRETE, (err, user) => {
     if (err) return next(errorHandler(403, "token is invalid"));
     req.user = user;
+    console.log('user after decode', user);
     next();
   });
 };
