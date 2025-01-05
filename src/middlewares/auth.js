@@ -4,6 +4,7 @@ const orderService = require('../services/orderService');
 const stadiumService = require('../services/stadiumService');
 
 exports.verifyToken = (req,res,next) => {
+    console.log(req.cookie);
     const token = req.cookie.jwt;
     if(!token) return next(errorHandler(403, 'token not found'));
 
