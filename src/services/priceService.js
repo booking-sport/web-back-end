@@ -43,6 +43,7 @@ class PriceService {
     detailDailyPriceByStadiumId_version2 = async (stadiumId, date, dayOfWeek = 'monday', orderType = 'single_booking') => {
         try {
             const conditions = this.buildConditions(stadiumId, dayOfWeek, orderType);
+            console.log('....', conditions);
             const [prices, orders, fields] = await Promise.all([
                 this.db('prices').select('*').where(conditions),
                 orderService.findOrderSuccessToday(stadiumId, date),
