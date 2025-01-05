@@ -61,6 +61,7 @@ class OrderController {
 
   createOrder = async (req, res, next) => {
     try {
+      console.log(req.user);
       let playerId = req.user ? req.user.player_id : undefined;
       const { orders, note, fullName, phoneNumber, deposit } = req.body;
       console.log(phoneNumber);
@@ -92,7 +93,7 @@ class OrderController {
       bigOrder.deposit = deposit;
 
       console.log(bigOrder);
-      
+
       const ordersToSave = orders.map((order) => {
         return this.convertOrderDetailCammelCase({
           ...order,
