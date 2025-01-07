@@ -22,8 +22,10 @@ exports.verifyToken = (req, res, next) => {
 
 exports.decodeToken = (req, res, next) => {
   const authorizationHeader = req.headers["authorization"];
-  if (!authorizationHeader) return next();
   const token = authorizationHeader.split(" ")[1];
+  if (token == undefined || token == "undefined" || token == "null") {
+    return next();
+  }
   if (!token) return next(errorHandler(403, "token not found"));
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRETE, (err, user) => {
     if (err) return next(errorHandler(403, "token is invalid"));
