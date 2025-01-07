@@ -73,10 +73,10 @@ class OrderController {
 
   createOrder = async (req, res, next) => {
     try {
-      console.log(req.user);
+      console.log('user: ', req.user);
       let playerId = req.user ? req.user.player_id : undefined;
       const { orders, note, fullName, phoneNumber, deposit } = req.body;
-      console.log(phoneNumber);
+      // console.log('playerID', playerId);
       if (!playerId)
         playerId = await userService.savePlayerNoPassword({
           fullName,
@@ -104,7 +104,7 @@ class OrderController {
       bigOrder.payment_status = "pending";
       bigOrder.deposit = deposit;
 
-      console.log(bigOrder);
+      console.log('bigOerder', bigOrder);
 
       const ordersToSave = orders.map((order) => {
         return this.convertOrderDetailCammelCase({
