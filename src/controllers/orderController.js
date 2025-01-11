@@ -126,9 +126,7 @@ class OrderController {
         });
         res.status(200).json({ data: paymentLinkRes });
       } catch (error) {
-        res.status(502).json({error: {
-          message: error.message
-        }})
+        next(errorHandler(200, error.message));
       }
       
     } catch (error) {
