@@ -116,16 +116,21 @@ class OrderController {
         await this.orderService.saveOrderWithDetails(bigOrder, ordersToSave);
 
       console.log(orderId, orderDetailsIds);
-
-      const paymentLinkRes = await payOS.createPaymentLink({
-        orderCode: orderId,
-        amount: bigOrder.total_price,
-        description: "note: " + note,
-        cancelUrl: "localhost:3000/",
-        returnUrl: "localhost:3000/",
-      });
-
-      res.status(200).json({ data: paymentLinkRes });
+      try {
+        const paymentLinkRes = await payOS.createPaymentLink({
+          orderCode: orderId,
+          amount: bigOrder.total_price,
+          description: "note: " + note,
+          cancelUrl: "localhost:3000/",
+          returnUrl: "localhost:3000/",
+        });
+        res.status(200).json({ data: paymentLinkRes });
+      } catch (error) {
+        res.status(502).json({error: {
+          message: error.message
+        }})
+      }
+      
     } catch (error) {
       next(error);
     }
