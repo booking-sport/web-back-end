@@ -54,6 +54,7 @@ class OrderController {
       const playerId = req.user.player_id;
       const date = req.query.date;
       const orders = await this.orderService.findByOnePlayer(playerId, date);
+      console.log('controllers', orders);
       res.status(200).json({ data: orders });
     } catch (error) {
       next(error);
@@ -103,8 +104,10 @@ class OrderController {
       bigOrder.is_created_by_player = true;
       bigOrder.payment_status = "pending";
       bigOrder.deposit = deposit;
+      bigOrder.full_name = fullName;
+      bigOrder.phone_number = phoneNumber;
 
-      console.log('bigOerder', bigOrder);
+      console.log('bigOrder', bigOrder);
 
       const ordersToSave = orders.map((order) => {
         return this.convertOrderDetailCammelCase({
