@@ -55,6 +55,15 @@ class StadiumController {
     }
   };
 
+  getStatisticByMonth = async (req, res, next) => {
+    try {
+        const records = await this.stadiumService.countStadiumsByMonth();
+        res.status(200).json({data: records});
+    } catch (error) {
+      next(error);
+    }
+  };
+
   create = async (req, res, next) => {
     try {
       const stadiumCammelCase = req.body;

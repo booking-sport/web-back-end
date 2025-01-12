@@ -3,6 +3,7 @@ const orderController = require('../controllers/orderController');
 const {verifyToken, decodeToken} = require('../middlewares/auth')
 
 router.get('/all', orderController.getAll);
+router.get("/statistic", orderController.getStatisticByMonth);
 router.get('/:orderId', orderController.getOne);
 router.get('/stadium/:stadiumId', orderController.getOrdersForOneStadium);
 router.get("/player/:playerId", orderController.getOrdersForOnePlayer);

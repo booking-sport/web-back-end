@@ -54,7 +54,7 @@ class OrderController {
       const playerId = req.user.player_id;
       const date = req.query.date;
       const orders = await this.orderService.findByOnePlayer(playerId, date);
-      console.log('controllers', orders);
+      console.log("controllers", orders);
       res.status(200).json({ data: orders });
     } catch (error) {
       next(error);
@@ -72,9 +72,18 @@ class OrderController {
     }
   };
 
+  getStatisticByMonth = async (req, res, next) => {
+    try {
+      const records = await this.orderService.countOrdersByMonth();
+      res.status(200).json({ data: records });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   createOrder = async (req, res, next) => {
     try {
-      console.log('user: ', req.user);
+      console.log("user: ", req.user);
       let playerId = req.user ? req.user.player_id : undefined;
       const { orders, note, fullName, phoneNumber, deposit } = req.body;
       // console.log('playerID', playerId);
@@ -107,7 +116,7 @@ class OrderController {
       bigOrder.full_name = fullName;
       bigOrder.phone_number = phoneNumber;
 
-      console.log('bigOrder', bigOrder);
+      console.log("bigOrder", bigOrder);
 
       const ordersToSave = orders.map((order) => {
         return this.convertOrderDetailCammelCase({
@@ -131,7 +140,6 @@ class OrderController {
       } catch (error) {
         next(errorHandler(200, error.message));
       }
-      
     } catch (error) {
       next(error);
     }

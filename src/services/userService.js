@@ -36,6 +36,32 @@ class UserService {
     }
   };
 
+  countPlayersByMonth = async () => {
+    try {
+        const records = await this.db("players")
+          .select(
+            this.db.raw("YEAR(created_at) AS year"),
+            this.db.raw("MONTH(created_at) AS month"),
+            this.db.raw("COUNT(*) AS count")
+          )
+          .groupByRaw("YEAR(created_at), MONTH(created_at)")
+          .orderBy(["year", "month"]);
+        let total = 0;
+        if(records && records.length > 0){
+            total = records.reduce((pre, ele) => {
+                return pre + ele.count;
+            }, 0);
+        }
+        
+        return {
+            total,
+            details: records
+        }
+    } catch (error) {
+        throw errorHandler(503, error.message);
+    }
+  }
+
   savePlayer = async (player) => {
     try {
       const { fullName, email, hashedPassword, phoneNumber } = player;

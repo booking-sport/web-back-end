@@ -63,7 +63,14 @@ class OrderService {
     try {
       const orders = await this.db("order_details")
         .join("orders", "order_details.order_id", "orders.id")
-        .select("order_details.*", "orders.stadium_id", "orders.player_id", 'orders.note', 'orders.full_name', 'orders.phone_number')
+        .select(
+          "order_details.*",
+          "orders.stadium_id",
+          "orders.player_id",
+          "orders.note",
+          "orders.full_name",
+          "orders.phone_number"
+        )
         .where("orders.player_id", playerId)
         .where((query) => {
           if (date) query.where("order_details.date", date);
@@ -123,6 +130,32 @@ class OrderService {
       const stadiums = await stadiumService.findByMangerId(managerId);
       const stadimIds = stadiums.map((ele) => ele.id);
       return await this.findByListStadium(stadimIds);
+    } catch (error) {
+      throw errorHandler(503, error.message);
+    }
+  };
+
+  countOrdersByMonth = async () => {
+    try {
+      const records = await this.db("order_details")
+        .select(
+          this.db.raw("YEAR(created_at) AS year"),
+          this.db.raw("MONTH(created_at) AS month"),
+          this.db.raw("COUNT(*) AS count")
+        )
+        .groupByRaw("YEAR(created_at), MONTH(created_at)")
+        .orderBy(["year", "month"]);
+      let total = 0;
+      if (records && records.length > 0) {
+        total = records.reduce((pre, ele) => {
+          return pre + ele.count;
+        }, 0);
+      }
+
+      return {
+        total,
+        details: records,
+      };
     } catch (error) {
       throw errorHandler(503, error.message);
     }
