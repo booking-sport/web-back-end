@@ -22,6 +22,9 @@ exports.verifyToken = (req, res, next) => {
 
 exports.decodeToken = (req, res, next) => {
   const authorizationHeader = req.headers["authorization"];
+  if (!authorizationHeader) {
+    return res.status(401).json({ message: "Authorization header missing" });
+  }
   const token = authorizationHeader.split(" ")[1];
   if (token == undefined || token == "undefined" || token == "null") {
     return next();
