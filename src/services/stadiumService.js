@@ -12,6 +12,7 @@ class StadiumService {
         try {
             const records = await this.db('stadiums')
                                             .select('*')
+                                            .where('isBanned', 0)
                                             .where((query) => {
                                                 if(stadiumType) query.where('stadium_type', stadiumType);
                                                 if(name) query.where('name', 'like', `%${name}%`);
