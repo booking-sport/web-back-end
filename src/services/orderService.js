@@ -152,8 +152,16 @@ class OrderService {
         }, 0);
       }
 
+      const groupOrderStatus = await this.db("order_details")
+        .select("order_status", this.db.raw("COUNT(*) AS count"))
+        .groupBy("order_status")
+        .orderBy("order_status");
+
+
+
       return {
         total,
+        count_status: groupOrderStatus,
         details: records,
       };
     } catch (error) {
