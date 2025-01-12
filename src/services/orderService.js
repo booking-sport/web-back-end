@@ -63,12 +63,11 @@ class OrderService {
     try {
       const orders = await this.db("order_details")
         .join("orders", "order_details.order_id", "orders.id")
-        .select("order_details.*", "orders.stadium_id", "orders.player_id")
+        .select("order_details.*", "orders.stadium_id", "orders.player_id", 'orders.note', 'orders.full_name', 'orders.phone_number')
         .where("orders.player_id", playerId)
         .where((query) => {
           if (date) query.where("order_details.date", date);
         });
-
       return orders;
     } catch (error) {
       throw errorHandler(503, error.message);
@@ -124,19 +123,6 @@ class OrderService {
       const stadiums = await stadiumService.findByMangerId(managerId);
       const stadimIds = stadiums.map((ele) => ele.id);
       return await this.findByListStadium(stadimIds);
-    } catch (error) {
-      throw errorHandler(503, error.message);
-    }
-  };
-
-  findByOnePlayer = async (playerId) => {
-    try {
-      const orders = await this.db("order_details")
-        .join("orders", "order_details.order_id", "orders.id")
-        .select("order_details.*", "orders.stadium_id", "orders.player_id")
-        .where("orders.player_id", playerId);
-
-      return orders;
     } catch (error) {
       throw errorHandler(503, error.message);
     }
