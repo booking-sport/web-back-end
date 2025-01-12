@@ -156,9 +156,6 @@ class OrderService {
         .select("order_status", this.db.raw("COUNT(*) AS count"))
         .groupBy("order_status")
         .orderBy("order_status");
-
-
-
       return {
         total,
         count_status: groupOrderStatus,
@@ -240,6 +237,76 @@ class OrderService {
         .where("order_id", orderId)
         .update(condition);
       return await this.findOneOrder(orderId);
+    } catch (error) {
+      throw errorHandler(503, error.message);
+    }
+  };
+
+  //not order but i write here
+  getSubscriptionByMonth = async () => {
+    try {
+      const subscriptions = await this.db("subscription").select(
+        "stadium_id",
+        "price",
+        "startDate",
+        "endDate"
+      );
+
+      const revenueByMonth = {};
+
+      for (const subscription of subscriptions) {
+        const { startDate, endDate, price } = subscription;
+
+        // Convert startDate and endDate to actual Date objects
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        // Iterate through each month between startDate and endDate
+        let currentMonth = start.getMonth() + 1; // months are 0-based, so add 1
+        let currentYear = start.getFullYear();
+
+        while (
+          currentYear < end.getFullYear() ||
+          (currentYear === end.getFullYear() &&
+            currentMonth <= end.getMonth() + 1)
+        ) {
+          const key = `${currentYear}-${currentMonth
+            .toString()
+            .padStart(2, "0")}`;
+
+          // Accumulate the price for the current month
+          if (revenueByMonth[key]) {
+            revenueByMonth[key] += price;
+          } else {
+            revenueByMonth[key] = price;
+          }
+
+          // Move to the next month
+          currentMonth++;
+          if (currentMonth > 12) {
+            currentMonth = 1;
+            currentYear++;
+          }
+        }
+      }
+
+      // Format result in the required output format
+      const result = Object.keys(revenueByMonth)
+        .map((key) => {
+          const [year, month] = key.split("-");
+          return {
+            year: parseInt(year, 10),
+            month: parseInt(month, 10),
+            revenue: revenueByMonth[key],
+          };
+        })
+        .sort((a, b) =>
+          a.year === b.year ? a.month - b.month : a.year - b.year
+        );
+
+      console.log(result);
+      return result;
+
     } catch (error) {
       throw errorHandler(503, error.message);
     }
