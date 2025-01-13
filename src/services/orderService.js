@@ -71,6 +71,7 @@ class OrderService {
           "orders.player_id",
           "orders.note",
           "orders.full_name",
+          "orders.deposit",
           "orders.phone_number",
           "stadiums.name as stadium_name",
           "stadiums.address",
