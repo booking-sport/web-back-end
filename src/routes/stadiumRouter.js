@@ -1,9 +1,11 @@
 const router = require('express').Router();
 const stadiumController = require('../controllers/stadiumController');
+const { verifyToken, isAdmin } = require('../middlewares/auth');
 const stadiumService = require('../services/stadiumService');
 
 router.get('/all', stadiumController.getAll);
 router.get('/manager', stadiumController.getSelfStadium);
+router.get('/statistic', stadiumController.getStatisticByMonth);
 router.get('/:stadiumId', stadiumController.getOneStadium);
 router.get('/:stadiumId/fields', stadiumController.getFields);
 router.get('/:stadiumId/payment-info', stadiumController.getPaymentInfo);
@@ -17,5 +19,6 @@ router.delete('/:stadiumId', stadiumController.removeStadium);
 router.delete('/:stadiumId/staff/:staffId', stadiumController.removeStaff);
 
 router.put('/:stadiumId', stadiumController.update);
+router.put("/active/:stadiumId", verifyToken, isAdmin, stadiumController.toggleActive);
 
 module.exports = router;

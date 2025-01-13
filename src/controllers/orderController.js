@@ -54,6 +54,7 @@ class OrderController {
       const playerId = req.user.player_id;
       const date = req.query.date;
       const orders = await this.orderService.findByOnePlayer(playerId, date);
+      console.log("controllers", orders);
       res.status(200).json({ data: orders });
     } catch (error) {
       next(error);
@@ -71,12 +72,21 @@ class OrderController {
     }
   };
 
+  getStatisticByMonth = async (req, res, next) => {
+    try {
+      const records = await this.orderService.countOrdersByMonth();
+      res.status(200).json({ data: records });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   createOrder = async (req, res, next) => {
     try {
-      console.log(req.user);
+      console.log("user: ", req.user);
       let playerId = req.user ? req.user.player_id : undefined;
       const { orders, note, fullName, phoneNumber, deposit } = req.body;
-      console.log(phoneNumber);
+      // console.log('playerID', playerId);
       if (!playerId)
         playerId = await userService.savePlayerNoPassword({
           fullName,
@@ -103,8 +113,10 @@ class OrderController {
       bigOrder.is_created_by_player = true;
       bigOrder.payment_status = "pending";
       bigOrder.deposit = deposit;
+      bigOrder.full_name = fullName;
+      bigOrder.phone_number = phoneNumber;
 
-      console.log(bigOrder);
+      console.log("bigOrder", bigOrder);
 
       const ordersToSave = orders.map((order) => {
         return this.convertOrderDetailCammelCase({
@@ -116,16 +128,18 @@ class OrderController {
         await this.orderService.saveOrderWithDetails(bigOrder, ordersToSave);
 
       console.log(orderId, orderDetailsIds);
-
-      const paymentLinkRes = await payOS.createPaymentLink({
-        orderCode: orderId,
-        amount: bigOrder.total_price,
-        description: "note: " + note,
-        cancelUrl: "localhost:3000/",
-        returnUrl: "localhost:3000/",
-      });
-
-      res.status(200).json({ data: paymentLinkRes });
+      try {
+        const paymentLinkRes = await payOS.createPaymentLink({
+          orderCode: orderId,
+          amount: bigOrder.total_price,
+          description: "note: " + note,
+          cancelUrl: "localhost:3000/",
+          returnUrl: "localhost:3000/",
+        });
+        res.status(200).json({ data: paymentLinkRes });
+      } catch (error) {
+        next(errorHandler(200, error.message));
+      }
     } catch (error) {
       next(error);
     }
@@ -199,6 +213,7 @@ class OrderController {
 
       order_id: orderDetails.orderId,
       stadium_id: orderDetails.stadiumId,
+      order_status: orderDetails.orderStatus
     };
   }
 }

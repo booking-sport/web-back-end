@@ -5,7 +5,7 @@ class AuthService {
     constructor() {}
 
     signToken(userData) {
-        return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRETE, {expiresIn: '30m'});
+        return jwt.sign(userData, process.env.ACCESS_TOKEN_SECRETE, {expiresIn: '2h'});
     }
     
 }
