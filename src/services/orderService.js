@@ -63,13 +63,18 @@ class OrderService {
     try {
       const orders = await this.db("order_details")
         .join("orders", "order_details.order_id", "orders.id")
+        .join('stadiums', 'order_details.stadium_id', 'stadiums.id')
+        .join('fields', 'order_details.field_id', 'fields.id')
         .select(
           "order_details.*",
           "orders.stadium_id",
           "orders.player_id",
           "orders.note",
           "orders.full_name",
-          "orders.phone_number"
+          "orders.phone_number",
+          "stadiums.name as stadium_name",
+          "stadiums.address",
+          "fields.name as field_name"
         )
         .where("orders.player_id", playerId)
         .where((query) => {

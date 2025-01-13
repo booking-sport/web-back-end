@@ -213,6 +213,7 @@ class OrderController {
 
       order_id: orderDetails.orderId,
       stadium_id: orderDetails.stadiumId,
+      order_status: orderDetails.orderStatus
     };
   }
 }
