@@ -12,7 +12,12 @@ class ManagerController {
     getAll = async (req,res,next) => {
         try {
             const managers = await this.userService.findAllManager();
-            res.status(200).json({data: managers});
+            const result = managers.map((ele) => {
+                if(ele.role == 'staff') ele.role = 'Staff';
+                if(ele.role == 'owner') ele.role = 'Owner';
+                return ele;
+            })
+            res.status(200).json({data: result});
         } catch (error) {
             next(error);
         }

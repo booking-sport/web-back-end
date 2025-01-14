@@ -1,6 +1,5 @@
-
-const db = require('../config/dbConfig');
-const { errorHandler } = require('../helpers/errorHandler');
+const db = require("../config/dbConfig");
+const { errorHandler } = require("../helpers/errorHandler");
 
 class UserService {
   constructor() {
@@ -38,29 +37,29 @@ class UserService {
 
   countPlayersByMonth = async () => {
     try {
-        const records = await this.db("players")
-          .select(
-            this.db.raw("YEAR(created_at) AS year"),
-            this.db.raw("MONTH(created_at) AS month"),
-            this.db.raw("COUNT(*) AS count")
-          )
-          .groupByRaw("YEAR(created_at), MONTH(created_at)")
-          .orderBy(["year", "month"]);
-        let total = 0;
-        if(records && records.length > 0){
-            total = records.reduce((pre, ele) => {
-                return pre + ele.count;
-            }, 0);
-        }
-        
-        return {
-            total,
-            details: records
-        }
+      const records = await this.db("players")
+        .select(
+          this.db.raw("YEAR(created_at) AS year"),
+          this.db.raw("MONTH(created_at) AS month"),
+          this.db.raw("COUNT(*) AS count")
+        )
+        .groupByRaw("YEAR(created_at), MONTH(created_at)")
+        .orderBy(["year", "month"]);
+      let total = 0;
+      if (records && records.length > 0) {
+        total = records.reduce((pre, ele) => {
+          return pre + ele.count;
+        }, 0);
+      }
+
+      return {
+        total,
+        details: records,
+      };
     } catch (error) {
-        throw errorHandler(503, error.message);
+      throw errorHandler(503, error.message);
     }
-  }
+  };
 
   savePlayer = async (player) => {
     try {
@@ -120,7 +119,13 @@ class UserService {
 
   findAllManager = async () => {
     try {
-      return await this.db("managers").select("*");
+      return await this.db("managers")
+        .join(
+          "stadiums_managers",
+          "managers.id",
+          "stadiums_managers.stadium_id"
+        )
+        .select("managers.*", "stadiums_managers.role");
     } catch (error) {
       throw errorHandler(503, error.message);
     }
@@ -129,7 +134,7 @@ class UserService {
   findManagerbyId = async (managerId) => {
     try {
       return await this.db("managers")
-        .select("*")
+        .select('*')
         .where("id", managerId)
         .first();
     } catch (error) {
