@@ -12,11 +12,23 @@ class ManagerController {
     getAll = async (req,res,next) => {
         try {
             const managers = await this.userService.findAllManager();
-            const result = managers.map((ele) => {
-                if(ele.role == 'staff') ele.role = 'Staff';
-                if(ele.role == 'owner') ele.role = 'Owner';
-                return ele;
-            })
+            const result = managers.reduce((arr, ele) => {
+              if (!arr.some((manager) => manager.id === ele.id)) {
+                // Clone the object and standardize the role
+                const standardizedManager = {
+                  ...ele,
+                  role:
+                    ele.role === "staff"
+                      ? "Staff"
+                      : ele.role === "owner"
+                      ? "Owner"
+                      : ele.role,
+                };
+                arr.push(standardizedManager);
+              }
+              return arr;
+            }, []);
+
             res.status(200).json({data: result});
         } catch (error) {
             next(error);
