@@ -123,7 +123,7 @@ class UserService {
         .join(
           "stadiums_managers",
           "managers.id",
-          "stadiums_managers.stadium_id"
+          "stadiums_managers.manager_id"
         )
         .select("managers.*", "stadiums_managers.role");
     } catch (error) {
