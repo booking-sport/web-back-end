@@ -4,6 +4,7 @@ const { verifyToken, isAdmin } = require('../middlewares/auth');
 const stadiumService = require('../services/stadiumService');
 
 router.get('/all', stadiumController.getAll);
+router.get('/both', stadiumController.getBothBanOrNot);
 router.get('/manager', stadiumController.getSelfStadium);
 router.get('/statistic', stadiumController.getStatisticByMonth);
 router.get('/:stadiumId', stadiumController.getOneStadium);

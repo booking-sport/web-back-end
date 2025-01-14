@@ -15,6 +15,16 @@ class StadiumController {
     }
   };
 
+  getBothBanOrNot = async (req, res, next) => {
+    try {
+      const { stadiumType, name } = req.query;
+      const stadiums = await this.stadiumService.findBothBanOrNot(stadiumType, name);
+      res.status(200).json({ data: stadiums });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getSelfStadium = async (req, res, next) => {
     try {
       const managerId = req.user.manager_id;
@@ -57,8 +67,8 @@ class StadiumController {
 
   getStatisticByMonth = async (req, res, next) => {
     try {
-        const records = await this.stadiumService.countStadiumsByMonth();
-        res.status(200).json({data: records});
+      const records = await this.stadiumService.countStadiumsByMonth();
+      res.status(200).json({ data: records });
     } catch (error) {
       next(error);
     }

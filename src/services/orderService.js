@@ -199,8 +199,10 @@ class OrderService {
       const ordersWithOrderId = ordersToSave.map((orderDetail) => ({
         ...orderDetail,
         order_id: orderId,
+        order_status: 'pending'
       }));
 
+      // console.log(ordersWithOrderId);
       const orderDetailsIds = await trx("order_details").insert(
         ordersWithOrderId
       );

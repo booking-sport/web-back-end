@@ -1,7 +1,7 @@
-const db = require('../config/dbConfig');
-const { errorHandler } = require('../helpers/errorHandler');
-const commentService = require('./commentService');
-const userService = require('./userService');
+const db = require("../config/dbConfig");
+const { errorHandler } = require("../helpers/errorHandler");
+const commentService = require("./commentService");
+const userService = require("./userService");
 
 class StadiumService {
   constructor() {
@@ -42,6 +42,19 @@ class StadiumService {
         return { ...record, images: imageStadium, owner, ratings };
       });
       return stadiums;
+    } catch (error) {
+      throw errorHandler(503, error.message);
+    }
+  };
+  findBothBanOrNot = async (stadiumType, name) => {
+    try {
+      const records = await this.db("stadiums")
+        .select("*")
+        .where((query) => {
+          if (stadiumType) query.where("stadium_type", stadiumType);
+          if (name) query.where("name", "like", `%${name}%`);
+        });
+      return records;
     } catch (error) {
       throw errorHandler(503, error.message);
     }
