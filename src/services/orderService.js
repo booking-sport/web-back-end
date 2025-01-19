@@ -63,8 +63,8 @@ class OrderService {
     try {
       const orders = await this.db("order_details")
         .join("orders", "order_details.order_id", "orders.id")
-        .join('stadiums', 'order_details.stadium_id', 'stadiums.id')
-        .join('fields', 'order_details.field_id', 'fields.id')
+        .join("stadiums", "order_details.stadium_id", "stadiums.id")
+        .join("fields", "order_details.field_id", "fields.id")
         .select(
           "order_details.*",
           "orders.stadium_id",
@@ -199,7 +199,7 @@ class OrderService {
       const ordersWithOrderId = ordersToSave.map((orderDetail) => ({
         ...orderDetail,
         order_id: orderId,
-        order_status: 'pending'
+        order_status: "pending",
       }));
 
       // console.log(ordersWithOrderId);
@@ -314,7 +314,6 @@ class OrderService {
 
       console.log(result);
       return result;
-
     } catch (error) {
       throw errorHandler(503, error.message);
     }

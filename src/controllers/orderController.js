@@ -116,7 +116,23 @@ class OrderController {
       bigOrder.full_name = fullName;
       bigOrder.phone_number = phoneNumber;
 
-      console.log("bigOrder", bigOrder);
+      const date = orders[0].date;
+      let todayOrders = await this.orderService.findOrderToday(stadiumId, date);
+
+      todayOrders = todayOrders.filter(
+        (ele) => ele.order_status !== "canceled"
+      );
+
+      console.log('here', orders, todayOrders);
+      
+      const isDuplicate = this.checkDuplicateOrder(orders, todayOrders);
+      console.log("isDuplicate", isDuplicate);
+      if(isDuplicate) return next(
+        errorHandler(
+          409,
+          "conflict with an existing order"
+        )
+      );
 
       const ordersToSave = orders.map((order) => {
         return this.convertOrderDetailCammelCase({
@@ -124,6 +140,7 @@ class OrderController {
           stadiumId,
         });
       });
+
       const { orderId, orderDetailsIds } =
         await this.orderService.saveOrderWithDetails(bigOrder, ordersToSave);
 
@@ -213,8 +230,24 @@ class OrderController {
 
       order_id: orderDetails.orderId,
       stadium_id: orderDetails.stadiumId,
-      order_status: orderDetails.orderStatus
+      order_status: orderDetails.orderStatus,
     };
+  }
+  checkDuplicateOrder(orders, todayOrders){
+
+    for(const order of orders){
+      const fieldId = order.fieldId;
+      const startTime = order.beginTime;
+      const endTime = order.endTime;
+      for(const todayOrder of todayOrders){
+        if(todayOrder.field_id == fieldId) {
+          const startTimeToday = todayOrder.begin_time;
+          const endTimeToday = todayOrder.end_time;
+          if(!( (endTime <= startTimeToday) || (startTime >= endTimeToday) )) return true;
+        }
+      }
+    }
+    return false;
   }
 }
 
